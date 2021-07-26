@@ -6,11 +6,11 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/23 17:10:30 by bahaas            #+#    #+#             */
-/*   Updated: 2021/07/26 18:04:17 by bahaas           ###   ########.fr       */
+/*   Updated: 2021/07/26 23:19:41 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_ping.h"
+#include "includes/ft_ping.h"
 #include <strings.h>
 
 t_main *g_main;
@@ -117,8 +117,9 @@ int	parsing(int ac, char **av)
 				g_main->opt = 1;
 		}
 		else
-			return 1;
+			return (1);
 	}
+	return (1);
 }
 
 void ping_loop(void)
