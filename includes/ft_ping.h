@@ -6,7 +6,7 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/23 18:06:43 by bahaas            #+#    #+#             */
-/*   Updated: 2021/07/26 18:01:50 by bahaas           ###   ########.fr       */
+/*   Updated: 2021/07/27 18:41:03 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,12 +22,26 @@
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <arpa/inet.h>
+#include <errno.h>
+
+#include <netinet/ip_icmp.h> //include icmphdr struct and ICMP_* var
+#include <netinet/in.h> //include icmphdr struct and ICMP_* var
+#include "../libft/libft.h"
+
+typedef struct s_pckt
+{
+	struct icmphdr *hdr;
+	struct iphdr *ip;
+	char	msg[64-sizeof(struct icmphdr)];
+}				t_pckt;
 
 typedef struct s_main
 {
 	struct sockaddr_in	*addr;
 	char				*host_name;
 	char				*host_addr;
+	t_pckt				packet;
+	int sock_fd;
 	int opt;
 	int quit;
 	int send_count;
