@@ -6,13 +6,13 @@
 #    By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/03/04 15:07:09 by bahaas            #+#    #+#              #
-#    Updated: 2021/07/27 17:50:29 by bahaas           ###   ########.fr        #
+#    Updated: 2021/07/28 21:02:38 by bahaas           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME			= ft_ping
 
-SRCS			= main.c
+SRCS			= main.c init.c signal.c
 
 CC				= clang
 
@@ -32,7 +32,7 @@ all: 		${NAME}
 ft_ping: 	${OBJS}
 			@printf "\n"
 			@make -C libft/ --no-print-directory -s
-			@${CC} ${CFLAGS} ${HEADER} ${OBJS} -o ${NAME} -L libft/ -lft
+			@${CC} ${CFLAGS} ${HEADER} ${OBJS} -o ${NAME} -L libft/ -lft -lm
 			@echo "\033[34m[FT_PING]\033[0m Building ft_ping program : \033[32mOK\033[0m"
 
 clean:
