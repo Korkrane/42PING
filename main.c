@@ -6,7 +6,7 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/28 16:53:09 by bahaas            #+#    #+#             */
-/*   Updated: 2021/07/29 17:32:26 by bahaas           ###   ########.fr       */
+/*   Updated: 2021/07/29 18:55:45 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,8 +112,6 @@ void ft_getadress(char *host_name)
 	ft_memcpy(&params.sockaddr, res->ai_addr, sizeof(struct sockaddr_in));
 	inet_ntop(AF_INET, &(params.sockaddr.sin_addr), address, INET_ADDRSTRLEN);
 	params.address = ft_strdup(address);
-	printf("address in ft_getadress: %s\n", params.address);
-	printf("reversed_address in ft_getadress: %s\n", params.reversed_address);
 }
 
 void	create_socket(void)
@@ -241,38 +239,41 @@ void	display_sequence(int received_bytes, t_reply reply, struct timeval start_ti
 	reply_ttl = (short)packet_content->ip_ttl;
 	time_elapsed = calculate_elapsed_time(start_timestamp, end_timestamp);
 	//time_elapsed = get_elapsed_time();
-	if(params.flags & D) //bonus :)
+	if(!(params.flags & Q))
 	{
-		struct timeval tv;
-		gettimeofday(&tv, NULL);
-		printf("[%ld.%ld]", tv.tv_sec, tv.tv_usec);
-	} // end bonus
-	char *bell;
-	bell = "";
-	if(params.flags & A)
-		bell = "\a";
-	if(!(params.flags & F))
-	{
-		if (ft_strcmp(params.address, params.user_requested_address) && !(params.flags & N))
+		if(params.flags & D) //bonus :)
 		{
-			printf("%lu bytes from %s (%s): icmp_seq=%d ttl=%d time=%.3lf ms%s\n", received_bytes - sizeof(struct ip),
-					params.reversed_address, params.address, params.seq, reply_ttl, time_elapsed, bell);
+			struct timeval tv;
+			gettimeofday(&tv, NULL);
+			printf("[%ld.%ld]", tv.tv_sec, tv.tv_usec);
+		} // end bonus
+		char *bell;
+		bell = "";
+		if(params.flags & A)
+			bell = "\a";
+		if(!(params.flags & F))
+		{
+			if (ft_strcmp(params.address, params.user_requested_address) && !(params.flags & N))
+			{
+				printf("%lu bytes from %s (%s): icmp_seq=%d ttl=%d time=%.3lf ms%s\n", received_bytes - sizeof(struct ip),
+						params.reversed_address, params.address, params.seq, reply_ttl, time_elapsed, bell);
+			}
+			else if(params.flags & N) //bonus -n
+			{
+				printf("%lu bytes from %s: icmp_seq=%d ttl=%d time=%.3lf ms%s\n", received_bytes - sizeof(struct ip),
+						params.address, params.seq, reply_ttl, time_elapsed, bell);
+			} // end bonus :)
+			else
+			{
+				printf("%lu bytes from %s: icmp_seq=%d ttl=%d time=%.3lf ms%s\n", received_bytes - sizeof(struct ip),
+						params.address, params.seq, reply_ttl, time_elapsed, bell);
+			}
 		}
-		else if(params.flags & N) //bonus -n
-		{
-			printf("%lu bytes from %s: icmp_seq=%d ttl=%d time=%.3lf ms%s\n", received_bytes - sizeof(struct ip),
-					params.address, params.seq, reply_ttl, time_elapsed, bell);
-		} // end bonus :)
 		else
 		{
-			printf("%lu bytes from %s: icmp_seq=%d ttl=%d time=%.3lf ms%s\n", received_bytes - sizeof(struct ip),
-					params.address, params.seq, reply_ttl, time_elapsed, bell);
+			ft_putchar_fd('\b', 1);
+			fflush(stdout);
 		}
-	}
-	else
-	{
-		ft_putchar_fd('\b', 1);
-		fflush(stdout);
 	}
 	set_rtt_stats(time_elapsed);
 }
@@ -302,7 +303,7 @@ void			ping_loop(void)
 	t_reply				reply;
 	char				check;
 
-	printf("PING %s (%s) 56(84) bytes of data.\n", params.reversed_address, params.address);
+	printf("PING %s (%s) %d(%d) bytes of data.\n", params.reversed_address, params.address, params.packet_size, params.packet_size + 28);
 	params.start = get_time();
 	set_time(&params.starting_time);
 	while(params.quit == 0)
@@ -433,6 +434,24 @@ void	get_deadline(char **av, int *i, int j)
 		printf("error ttl -t opt\n");
 }
 
+void	get_packetsize(char **av, int *i, int j)
+{
+	int	count;
+
+	if (av[*i][j + 1] == '\0' && av[*i + 1] != NULL)
+	{
+		params.opts.packet_size = ft_atoi(av[*i + 1]);
+		++*i;
+	}
+	else if (ft_isdigit(av[*i][j + 1]))
+	{
+		params.opts.packet_size = ft_atoi(&av[*i][j + 1]);
+		//++*j to check nexxt opt ?
+	}
+	else
+		printf("error ttl -t opt\n");
+}
+
 int parsing(int ac, char **av)
 {
 	if(ac < 2)
@@ -474,7 +493,7 @@ int parsing(int ac, char **av)
 						get_preload(av, &i, j);
 						opt = 0;
 						break;
-					case 't': //set new ttl :)
+					case 't': //set new ttl :) //TO DO TTL>255 launch error :)
 						params.flags |= T;
 						get_ttl(av, &i, j);
 						opt = 0;
@@ -483,8 +502,18 @@ int parsing(int ac, char **av)
 						params.flags |= A;
 						break;
 					case 'w': //exit after x seconds (not done yet)
+						params.flags |= W;
 						get_deadline(av, &i, j);
 						opt = 0;
+						break;
+					case 's': //modify default (64) packet size
+						params.flags |= S;
+						get_packetsize(av, &i, j);
+						printf("packet opt size: %d\n", params.opts.packet_size);
+						opt = 0;
+						break;
+					case 'q': //quiet output (no display seq)
+						params.flags |= Q;
 						break;
 					default: //wrong opt
 						printf("ping: Invalid option -- '%c'\n", av[i][j]);
@@ -507,9 +536,6 @@ int		main(int ac, char **av)
 	{
 		init(ac, av);
 		set_signal();
-		printf("user_requested_address: %s\n", params.user_requested_address);
-		printf("address: %s\n", params.address);
-		printf("reversed_address: %s\n", params.reversed_address);
 		if (params.address)
 			create_socket();
 		if (params.socket_fd != -1)

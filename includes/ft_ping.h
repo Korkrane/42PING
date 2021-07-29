@@ -6,7 +6,7 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/23 18:06:43 by bahaas            #+#    #+#             */
-/*   Updated: 2021/07/29 17:28:40 by bahaas           ###   ########.fr       */
+/*   Updated: 2021/07/29 18:51:48 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,19 +60,6 @@
 # define ERROR_CODE			1
 # define SUCCESS_CODE		0
 
-/*
-** BYTE SWAP MACROS (ENDIANNESS)
-*/
-
-/*
-typedef struct s_pckt
-{
-	struct icmphdr *hdr;
-	struct iphdr *ip;
-	char	msg[64-sizeof(struct icmphdr)];
-}				t_pckt;
-*/
-
 typedef enum e_flags
 {
 	V = 1 << 0,
@@ -84,7 +71,9 @@ typedef enum e_flags
 	L = 1 << 7,
 	T = 1 << 8,
 	A = 1 << 9,
-	W = 1 << 10
+	W = 1 << 10,
+	Q = 1 << 11,
+	S = 1 << 12
 }				t_flags;
 
 typedef struct				s_reply
@@ -118,6 +107,7 @@ typedef struct				s_opt
 	int preload;
 	int ttl;
 	double deadline;
+	int		packet_size;
 }							t_opts;
 
 typedef struct s_params
@@ -141,6 +131,7 @@ typedef struct s_params
 	struct timeval			ending_time;
 	long					start;
 	long					end;
+	int						packet_size;
 	t_time					time;
 
 }				t_params;

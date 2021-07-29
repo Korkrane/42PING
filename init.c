@@ -6,7 +6,7 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/28 20:03:27 by bahaas            #+#    #+#             */
-/*   Updated: 2021/07/29 15:57:35 by bahaas           ###   ########.fr       */
+/*   Updated: 2021/07/29 18:53:45 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,9 @@ char	*get_host(int ac, char **av)
 void	init(int ac, char **av)
 {
 	init_time();
+	params.packet_size = 56;
+	if((params.flags & S))
+		params.packet_size = params.opts.packet_size;
 	params.sent_packets = 0;
 	params.received_packets = 0;
 	params.error_packets = 0;
@@ -65,6 +68,9 @@ void	init_packet(struct s_packet *packet, struct timeval current_time)
 	packet->icmp_header.icmp_seq = BSWAP16(params.seq);
 	packet->icmp_header.icmp_id = BSWAP16(params.process_id);
 	ft_memcpy(&packet->icmp_header.icmp_dun, &(current_time.tv_sec), sizeof(current_time.tv_sec));
+	//for(int i = 0; i < params.opts.packet_size; i++)
+	//	packet->icmp_header.icmp_data[i] = i;
+	//packet->icmp_header.icmp_cksum = 0;
 	packet->icmp_header.icmp_cksum = checksum(packet, sizeof(*packet));
 }
 
@@ -75,6 +81,7 @@ void init_reply(t_reply *reply)
 	reply->iov.iov_base = reply->receive_buffer;
 	reply->iov.iov_len = sizeof(reply->receive_buffer);
 	reply->msghdr.msg_name = params.address;
+	//reply->msghdr.msg_namelen = ft_strlen(params.address);
 	reply->msghdr.msg_iov = &reply->iov;
 	reply->msghdr.msg_iovlen = 1;
 	reply->msghdr.msg_control = &reply->control;
