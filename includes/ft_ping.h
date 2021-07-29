@@ -6,7 +6,7 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/23 18:06:43 by bahaas            #+#    #+#             */
-/*   Updated: 2021/07/28 21:57:44 by bahaas           ###   ########.fr       */
+/*   Updated: 2021/07/29 17:28:40 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,14 @@ typedef enum e_flags
 {
 	V = 1 << 0,
 	D = 1 << 1,
-	H = 1 << 2
+	I = 1 << 2,
+	N = 1 << 4,
+	H = 1 << 5,
+	F = 1 << 6,
+	L = 1 << 7,
+	T = 1 << 8,
+	A = 1 << 9,
+	W = 1 << 10
 }				t_flags;
 
 typedef struct				s_reply
@@ -107,6 +114,10 @@ typedef struct				s_time
 typedef struct				s_opt
 {
 	int count;
+	int interval;
+	int preload;
+	int ttl;
+	double deadline;
 }							t_opts;
 
 typedef struct s_params

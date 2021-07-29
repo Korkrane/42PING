@@ -6,7 +6,7 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/28 16:53:09 by bahaas            #+#    #+#             */
-/*   Updated: 2021/07/28 22:26:58 by bahaas           ###   ########.fr       */
+/*   Updated: 2021/07/29 17:32:26 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,8 +112,8 @@ void ft_getadress(char *host_name)
 	ft_memcpy(&params.sockaddr, res->ai_addr, sizeof(struct sockaddr_in));
 	inet_ntop(AF_INET, &(params.sockaddr.sin_addr), address, INET_ADDRSTRLEN);
 	params.address = ft_strdup(address);
-	//	printf("address: %s\n", params.address);
-	//	printf("reversed_address: %s\n", params.reversed_address);
+	printf("address in ft_getadress: %s\n", params.address);
+	printf("reversed_address in ft_getadress: %s\n", params.reversed_address);
 }
 
 void	create_socket(void)
@@ -166,6 +166,11 @@ char			send_packet(t_packet *packet)
 		else
 			error_output(SENDTO_ERROR);
 		return (ERROR_CODE);
+	}
+	if (params.flags & F)
+	{
+		ft_putchar_fd('.', 1);
+		fflush(stdout);
 	}
 	return (SUCCESS_CODE);
 }
@@ -236,21 +241,38 @@ void	display_sequence(int received_bytes, t_reply reply, struct timeval start_ti
 	reply_ttl = (short)packet_content->ip_ttl;
 	time_elapsed = calculate_elapsed_time(start_timestamp, end_timestamp);
 	//time_elapsed = get_elapsed_time();
-	if(params.flags & D)
+	if(params.flags & D) //bonus :)
 	{
-		//double		curr_time;
-		//curr_time = get_time();
-		//printf("[%lf] ", curr_time);
-	}
-	if (ft_strcmp(params.address, params.user_requested_address))
+		struct timeval tv;
+		gettimeofday(&tv, NULL);
+		printf("[%ld.%ld]", tv.tv_sec, tv.tv_usec);
+	} // end bonus
+	char *bell;
+	bell = "";
+	if(params.flags & A)
+		bell = "\a";
+	if(!(params.flags & F))
 	{
-		printf("%lu bytes from %s (%s): icmp_seq=%d ttl=%d time=%.3lf ms\n", received_bytes - sizeof(struct ip),
-				params.reversed_address, params.address, params.seq, reply_ttl, time_elapsed);
+		if (ft_strcmp(params.address, params.user_requested_address) && !(params.flags & N))
+		{
+			printf("%lu bytes from %s (%s): icmp_seq=%d ttl=%d time=%.3lf ms%s\n", received_bytes - sizeof(struct ip),
+					params.reversed_address, params.address, params.seq, reply_ttl, time_elapsed, bell);
+		}
+		else if(params.flags & N) //bonus -n
+		{
+			printf("%lu bytes from %s: icmp_seq=%d ttl=%d time=%.3lf ms%s\n", received_bytes - sizeof(struct ip),
+					params.address, params.seq, reply_ttl, time_elapsed, bell);
+		} // end bonus :)
+		else
+		{
+			printf("%lu bytes from %s: icmp_seq=%d ttl=%d time=%.3lf ms%s\n", received_bytes - sizeof(struct ip),
+					params.address, params.seq, reply_ttl, time_elapsed, bell);
+		}
 	}
 	else
 	{
-		printf("%lu bytes from %s: icmp_seq=%d ttl=%d time=%.3lf ms\n", received_bytes - sizeof(struct ip),
-				params.address, params.seq, reply_ttl, time_elapsed);
+		ft_putchar_fd('\b', 1);
+		fflush(stdout);
 	}
 	set_rtt_stats(time_elapsed);
 }
@@ -315,7 +337,10 @@ void			ping_loop(void)
 			}
 		}	
 		params.seq++;
-		wait_interval(current_start_timestamp);
+		if(params.opts.preload - 1 > 0) //-l bonus :)
+			params.opts.preload--;
+		else
+			wait_interval(current_start_timestamp);
 	}
 }
 
@@ -333,7 +358,79 @@ void	get_count(char **av, int *i, int j)
 		params.opts.count = ft_atoi(&av[*i][j + 1]);
 	}
 	else
-		printf("erro count opt\n");
+		printf("erro count -c opt\n");
+}
+
+void	get_interval(char **av, int *i, int j)
+{
+	int	count;
+
+	if (av[*i][j + 1] == '\0' && av[*i + 1] != NULL)
+	{
+		params.opts.interval = ft_atoi(av[*i + 1]);
+		++*i;
+	}
+	else if (ft_isdigit(av[*i][j + 1]))
+	{
+		params.opts.interval = ft_atoi(&av[*i][j + 1]);
+		//++*j to check nexxt opt ?
+	}
+	else
+		printf("erro interval -i opt\n");
+}
+
+void	get_preload(char **av, int *i, int j)
+{
+	int	count;
+
+	if (av[*i][j + 1] == '\0' && av[*i + 1] != NULL)
+	{
+		params.opts.preload = ft_atoi(av[*i + 1]);
+		++*i;
+	}
+	else if (ft_isdigit(av[*i][j + 1]))
+	{
+		params.opts.preload = ft_atoi(&av[*i][j + 1]);
+		//++*j to check nexxt opt ?
+	}
+	else
+		printf("erro preload -l opt\n");
+}
+
+void	get_ttl(char **av, int *i, int j)
+{
+	int	count;
+
+	if (av[*i][j + 1] == '\0' && av[*i + 1] != NULL)
+	{
+		params.opts.deadline = ft_atoi(av[*i + 1]);
+		++*i;
+	}
+	else if (ft_isdigit(av[*i][j + 1]))
+	{
+		params.opts.deadline = ft_atoi(&av[*i][j + 1]);
+		//++*j to check nexxt opt ?
+	}
+	else
+		printf("error deadline -w opt\n");
+}
+
+void	get_deadline(char **av, int *i, int j)
+{
+	int	count;
+
+	if (av[*i][j + 1] == '\0' && av[*i + 1] != NULL)
+	{
+		params.opts.ttl = ft_atoi(av[*i + 1]);
+		++*i;
+	}
+	else if (ft_isdigit(av[*i][j + 1]))
+	{
+		params.opts.ttl = ft_atoi(&av[*i][j + 1]);
+		//++*j to check nexxt opt ?
+	}
+	else
+		printf("error ttl -t opt\n");
 }
 
 int parsing(int ac, char **av)
@@ -361,6 +458,34 @@ int parsing(int ac, char **av)
 					case 'D': //timestamp before each line;
 						params.flags |= D;
 						break;
+					case 'i': // set new specific interval 
+						params.flags |= I;
+						get_interval(av, &i, j);
+						opt = 0;
+						break;
+					case 'n': //display only ip in packet sequence
+						params.flags |= N;
+						break;
+					case 'f': //flood print . on echo request and backspace on receive + interval=0 unless it's specified :)
+						params.flags |= F;
+						break;
+					case 'l': //l value = X packet to send without wait interval
+						params.flags |= L;
+						get_preload(av, &i, j);
+						opt = 0;
+						break;
+					case 't': //set new ttl :)
+						params.flags |= T;
+						get_ttl(av, &i, j);
+						opt = 0;
+						break;
+					case 'a': //bell song on each display sequence
+						params.flags |= A;
+						break;
+					case 'w': //exit after x seconds (not done yet)
+						get_deadline(av, &i, j);
+						opt = 0;
+						break;
 					default: //wrong opt
 						printf("ping: Invalid option -- '%c'\n", av[i][j]);
 						return(help());
@@ -382,6 +507,9 @@ int		main(int ac, char **av)
 	{
 		init(ac, av);
 		set_signal();
+		printf("user_requested_address: %s\n", params.user_requested_address);
+		printf("address: %s\n", params.address);
+		printf("reversed_address: %s\n", params.reversed_address);
 		if (params.address)
 			create_socket();
 		if (params.socket_fd != -1)

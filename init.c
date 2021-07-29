@@ -6,7 +6,7 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/28 20:03:27 by bahaas            #+#    #+#             */
-/*   Updated: 2021/07/28 22:20:15 by bahaas           ###   ########.fr       */
+/*   Updated: 2021/07/29 15:57:35 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,8 +42,14 @@ void	init(int ac, char **av)
 	params.sent_packets = 0;
 	params.received_packets = 0;
 	params.error_packets = 0;
-	params.interval = 1;
+	params.interval = 0;
+	if(!(params.flags & F))
+		params.interval = 1;
+	if((params.flags & I))
+		params.interval = params.opts.interval;
 	params.ttl = 64;
+	if(params.flags & T)
+		params.ttl = params.opts.ttl;
 	params.process_id = getpid();
 	params.seq = 1;
 	params.socket_fd = -1;
