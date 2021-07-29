@@ -6,13 +6,13 @@
 #    By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/03/04 15:07:09 by bahaas            #+#    #+#              #
-#    Updated: 2021/07/28 21:02:38 by bahaas           ###   ########.fr        #
+#    Updated: 2021/07/29 19:06:20 by bahaas           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME			= ft_ping
 
-SRCS			= main.c init.c signal.c
+SRCS			= main.c init.c signal.c options.c time.c stats.c
 
 CC				= clang
 

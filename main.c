@@ -6,7 +6,7 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/28 16:53:09 by bahaas            #+#    #+#             */
-/*   Updated: 2021/07/29 18:55:45 by bahaas           ###   ########.fr       */
+/*   Updated: 2021/07/29 19:05:39 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,61 +25,6 @@ static int help()
 			"\t     [-S sndbuf] [-t ttl] [-T timestamp_option] [-w deadline]\n"
 			"\t     [-W timeout] destination\n");
 	return (0);
-}
-
-double	get_time(void)
-{
-	struct timeval	tv;
-	double			end;
-
-	gettimeofday(&tv, NULL);
-	end = ((tv.tv_sec * 1000) + tv.tv_usec / 1000);
-	return (end);
-}
-
-double	get_elapsed_time(double starter)
-{
-	struct timeval	tv;
-	double			end;
-
-	gettimeofday(&tv, NULL);
-	end = ((tv.tv_sec * 1000) + tv.tv_usec / 1000);
-	return (end - starter);
-}
-
-void set_rtt_stats(double rtt)
-{
-	if(params.time.min == 0 || rtt < params.time.min)
-		params.time.min = rtt;
-	if(params.time.max == 0 || rtt > params.time.max)
-		params.time.max = rtt;
-	params.time.total += rtt;
-	params.time.avg = params.time.total / params.received_packets;
-}
-
-double get_mdev()
-{
-	double mdev;
-	double avg;
-	double avg_square;
-
-	avg = params.time.total / params.received_packets;
-	avg_square = (params.time.total * params.time.total) / params.received_packets;
-	mdev = sqrt(avg_square - (avg * avg));
-	return (mdev);
-}
-
-void print_stats()
-{
-	long time;
-	double mdev;
-
-	time = get_elapsed_time(params.start);
-	if(params.received_packets == 1)
-		time = 0;
-	printf("\n--- %s params statistics ---\n", params.reversed_address);
-	printf("%d packets transmitted, %d received, %d%% packet loss, time %ldms\n", params.sent_packets, params.received_packets, 0, time);
-	printf("rtt min/avg/max/mdev = %.3lf/%.3lf/%.3lf/%.3lf ms\n", params.time.min, params.time.avg, params.time.max, get_mdev());
 }
 
 void	error_output(char *message)
@@ -173,12 +118,6 @@ char			send_packet(t_packet *packet)
 	return (SUCCESS_CODE);
 }
 
-void			set_time(struct timeval *destination)
-{
-	if (gettimeofday(destination, NULL) == -1)
-		error_output_and_exit(TIMEOFDAY_ERROR);
-}
-
 char			check_reply(t_reply *reply)
 {
 	struct ip	*packet_content;
@@ -221,12 +160,6 @@ char	receive_reply(t_reply *reply)
 		return (ERROR_CODE);
 	}
 	return (SUCCESS_CODE);
-}
-
-double			calculate_elapsed_time(struct timeval start, struct timeval end)
-{
-	return (((double)((double)end.tv_sec - (double)start.tv_sec) * 1000) +
-			(double)((double)end.tv_usec - (double)start.tv_usec) / 1000);
 }
 
 void	display_sequence(int received_bytes, t_reply reply, struct timeval start_timestamp, struct timeval end_timestamp)
@@ -289,9 +222,7 @@ void			wait_interval(struct timeval start)
 		goal_time.tv_sec = current_time.tv_sec + (long)params.interval;
 		goal_time.tv_usec = current_time.tv_usec + (long)((params.interval - (long)params.interval) * 1000000);
 		while (timercmp(&current_time, &goal_time, <))
-		{
 			set_time(&current_time);
-		}
 	}
 }
 
@@ -343,113 +274,6 @@ void			ping_loop(void)
 		else
 			wait_interval(current_start_timestamp);
 	}
-}
-
-void	get_count(char **av, int *i, int j)
-{
-	int	count;
-
-	if (av[*i][j + 1] == '\0' && av[*i + 1] != NULL)
-	{
-		params.opts.count = ft_atoi(av[*i + 1]);	
-		++*i;
-	}
-	else if (ft_isdigit(av[*i][j + 1]))
-	{
-		params.opts.count = ft_atoi(&av[*i][j + 1]);
-	}
-	else
-		printf("erro count -c opt\n");
-}
-
-void	get_interval(char **av, int *i, int j)
-{
-	int	count;
-
-	if (av[*i][j + 1] == '\0' && av[*i + 1] != NULL)
-	{
-		params.opts.interval = ft_atoi(av[*i + 1]);
-		++*i;
-	}
-	else if (ft_isdigit(av[*i][j + 1]))
-	{
-		params.opts.interval = ft_atoi(&av[*i][j + 1]);
-		//++*j to check nexxt opt ?
-	}
-	else
-		printf("erro interval -i opt\n");
-}
-
-void	get_preload(char **av, int *i, int j)
-{
-	int	count;
-
-	if (av[*i][j + 1] == '\0' && av[*i + 1] != NULL)
-	{
-		params.opts.preload = ft_atoi(av[*i + 1]);
-		++*i;
-	}
-	else if (ft_isdigit(av[*i][j + 1]))
-	{
-		params.opts.preload = ft_atoi(&av[*i][j + 1]);
-		//++*j to check nexxt opt ?
-	}
-	else
-		printf("erro preload -l opt\n");
-}
-
-void	get_ttl(char **av, int *i, int j)
-{
-	int	count;
-
-	if (av[*i][j + 1] == '\0' && av[*i + 1] != NULL)
-	{
-		params.opts.deadline = ft_atoi(av[*i + 1]);
-		++*i;
-	}
-	else if (ft_isdigit(av[*i][j + 1]))
-	{
-		params.opts.deadline = ft_atoi(&av[*i][j + 1]);
-		//++*j to check nexxt opt ?
-	}
-	else
-		printf("error deadline -w opt\n");
-}
-
-void	get_deadline(char **av, int *i, int j)
-{
-	int	count;
-
-	if (av[*i][j + 1] == '\0' && av[*i + 1] != NULL)
-	{
-		params.opts.ttl = ft_atoi(av[*i + 1]);
-		++*i;
-	}
-	else if (ft_isdigit(av[*i][j + 1]))
-	{
-		params.opts.ttl = ft_atoi(&av[*i][j + 1]);
-		//++*j to check nexxt opt ?
-	}
-	else
-		printf("error ttl -t opt\n");
-}
-
-void	get_packetsize(char **av, int *i, int j)
-{
-	int	count;
-
-	if (av[*i][j + 1] == '\0' && av[*i + 1] != NULL)
-	{
-		params.opts.packet_size = ft_atoi(av[*i + 1]);
-		++*i;
-	}
-	else if (ft_isdigit(av[*i][j + 1]))
-	{
-		params.opts.packet_size = ft_atoi(&av[*i][j + 1]);
-		//++*j to check nexxt opt ?
-	}
-	else
-		printf("error ttl -t opt\n");
 }
 
 int parsing(int ac, char **av)

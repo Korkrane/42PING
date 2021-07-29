@@ -6,7 +6,7 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/23 18:06:43 by bahaas            #+#    #+#             */
-/*   Updated: 2021/07/29 18:51:48 by bahaas           ###   ########.fr       */
+/*   Updated: 2021/07/29 19:06:09 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,4 +152,25 @@ void ft_getadress(char *host_name);
 unsigned short	checksum(void *address, int len);
 void sig_int();
 void sig_quit();
+
+
+
+void	get_count(char **av, int *i, int j);
+void	get_interval(char **av, int *i, int j);
+void	get_preload(char **av, int *i, int j);
+void	get_ttl(char **av, int *i, int j);
+void	get_deadline(char **av, int *i, int j);
+void	get_packetsize(char **av, int *i, int j);
+
+double	get_time(void);
+double	get_elapsed_time(double starter);
+double	calculate_elapsed_time(struct timeval start, struct timeval end);
+void	set_time(struct timeval *destination);
+
+void	error_output_and_exit(char *message);
+void	error_output(char *message);
+
+void print_stats();
+void set_rtt_stats(double rtt);
+double get_mdev();
 #endif
