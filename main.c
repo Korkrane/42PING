@@ -6,7 +6,7 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/28 16:53:09 by bahaas            #+#    #+#             */
-/*   Updated: 2021/07/29 19:05:39 by bahaas           ###   ########.fr       */
+/*   Updated: 2021/07/29 22:28:05 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,109 +59,6 @@ void ft_getadress(char *host_name)
 	params.address = ft_strdup(address);
 }
 
-void	create_socket(void)
-{
-	int				socket_fd;
-	struct timeval	timeout;
-
-	timeout.tv_sec = 1;
-	timeout.tv_usec = 0;
-	if ((socket_fd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP)) == -1)
-		error_output_and_exit(SOCKET_ERROR);
-	if ((setsockopt(socket_fd, IPPROTO_IP, IP_TTL, &(params.ttl), sizeof(params.ttl))) == -1)
-		error_output_and_exit(SETSOCKOPT_ERROR);
-	if ((setsockopt(socket_fd, SOL_SOCKET, SO_RCVTIMEO, (const void *)&timeout, sizeof(timeout))) == -1)
-		error_output_and_exit(SETSOCKOPT_ERROR);
-	params.socket_fd = socket_fd;
-}
-
-
-unsigned short	checksum(void *address, int len)
-{
-	unsigned short	*buff;
-	unsigned long	sum;
-
-	buff = (unsigned short *)address;
-	sum = 0;
-	while (len > 1)
-	{
-		sum += *buff;
-		buff++;
-		len -= sizeof(unsigned short);
-	}
-	if (len)
-		sum += *(unsigned char *)buff;
-	sum = (sum >> 16) + (sum & 0xFFFF);
-	sum += (sum >> 16);
-	return ((unsigned short)~sum);
-}
-
-char			send_packet(t_packet *packet)
-{
-	ssize_t sent_bytes;
-
-	sent_bytes = sendto(params.socket_fd, packet, sizeof(*packet), 0,
-			(struct sockaddr*)&params.sockaddr, sizeof(params.sockaddr));
-	if (sent_bytes <= 0)
-	{
-		if (errno == ENETUNREACH)
-			error_output(NO_CONNEXION_ERROR);
-		else
-			error_output(SENDTO_ERROR);
-		return (ERROR_CODE);
-	}
-	if (params.flags & F)
-	{
-		ft_putchar_fd('.', 1);
-		fflush(stdout);
-	}
-	return (SUCCESS_CODE);
-}
-
-char			check_reply(t_reply *reply)
-{
-	struct ip	*packet_content;
-
-	packet_content = (struct ip *)reply->receive_buffer;
-	if (packet_content->ip_p != IPPROTO_ICMP)
-	{
-		//	if (params.flags & V_FLAG)
-		//		error_output(REPLY_ERROR);
-		return (ERROR_CODE);
-	}
-	reply->icmp = (struct icmp *)(reply->receive_buffer + (packet_content->ip_hl << 2));
-	if (reply->icmp->icmp_type == 11 && reply->icmp->icmp_code == 0)
-	{
-		return (TTL_EXCEEDED_CODE);
-	}
-	else if (BSWAP16(reply->icmp->icmp_id) != params.process_id || BSWAP16(reply->icmp->icmp_seq) != params.seq)
-	{
-		init_reply(reply);
-		return (receive_reply(reply));
-	}
-	return (SUCCESS_CODE);
-}
-
-char	receive_reply(t_reply *reply)
-{
-	reply->received_bytes = recvmsg(params.socket_fd, &(reply->msghdr), 0);
-	if (reply->received_bytes > 0)
-	{
-		return (check_reply(reply));
-	}
-	else
-	{
-		if ((errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR))
-		{
-			;
-		}
-		else
-			error_output(RECV_ERROR);
-		return (ERROR_CODE);
-	}
-	return (SUCCESS_CODE);
-}
-
 void	display_sequence(int received_bytes, t_reply reply, struct timeval start_timestamp, struct timeval end_timestamp)
 {
 	short		reply_ttl;
@@ -172,7 +69,7 @@ void	display_sequence(int received_bytes, t_reply reply, struct timeval start_ti
 	reply_ttl = (short)packet_content->ip_ttl;
 	time_elapsed = calculate_elapsed_time(start_timestamp, end_timestamp);
 	//time_elapsed = get_elapsed_time();
-	if(!(params.flags & Q))
+	if(!(params.flags & q))
 	{
 		if(params.flags & D) //bonus :)
 		{
@@ -182,16 +79,16 @@ void	display_sequence(int received_bytes, t_reply reply, struct timeval start_ti
 		} // end bonus
 		char *bell;
 		bell = "";
-		if(params.flags & A)
+		if(params.flags & a)
 			bell = "\a";
-		if(!(params.flags & F))
+		if(!(params.flags & f))
 		{
-			if (ft_strcmp(params.address, params.user_requested_address) && !(params.flags & N))
+			if (ft_strcmp(params.address, params.user_requested_address) && !(params.flags & n))
 			{
 				printf("%lu bytes from %s (%s): icmp_seq=%d ttl=%d time=%.3lf ms%s\n", received_bytes - sizeof(struct ip),
 						params.reversed_address, params.address, params.seq, reply_ttl, time_elapsed, bell);
 			}
-			else if(params.flags & N) //bonus -n
+			else if(params.flags & n) //bonus -n
 			{
 				printf("%lu bytes from %s: icmp_seq=%d ttl=%d time=%.3lf ms%s\n", received_bytes - sizeof(struct ip),
 						params.address, params.seq, reply_ttl, time_elapsed, bell);
@@ -284,62 +181,20 @@ int parsing(int ac, char **av)
 	{
 		if(av[i][0] == '-')
 		{
-			int opt = 1;
-			for(int j = 1; av[i][j] && opt; j++)
+			int flag = 1;
+			for(int j = 1; av[i][j] && flag; j++)
 			{
 				switch (av[i][j])
 				{
-					case 'v': // 
-						params.flags |= V;
+					case 'v': case 'D': case 'n': case 'f': case 'a': case 'q': 
+						add_no_params_opt(av[i][j]);
 						break;
-					case 'h': //help display
+					case 'h':
 						return(help());
-					case 'c': //count packet has to be sent
-						get_count(av, &i, j);
-						opt = 0;
+					case 'c': case 'i': case 'l': case 't': case 'w': case 's':
+						add_params_opt(av, &i, j, &flag);
 						break;
-					case 'D': //timestamp before each line;
-						params.flags |= D;
-						break;
-					case 'i': // set new specific interval 
-						params.flags |= I;
-						get_interval(av, &i, j);
-						opt = 0;
-						break;
-					case 'n': //display only ip in packet sequence
-						params.flags |= N;
-						break;
-					case 'f': //flood print . on echo request and backspace on receive + interval=0 unless it's specified :)
-						params.flags |= F;
-						break;
-					case 'l': //l value = X packet to send without wait interval
-						params.flags |= L;
-						get_preload(av, &i, j);
-						opt = 0;
-						break;
-					case 't': //set new ttl :) //TO DO TTL>255 launch error :)
-						params.flags |= T;
-						get_ttl(av, &i, j);
-						opt = 0;
-						break;
-					case 'a': //bell song on each display sequence
-						params.flags |= A;
-						break;
-					case 'w': //exit after x seconds (not done yet)
-						params.flags |= W;
-						get_deadline(av, &i, j);
-						opt = 0;
-						break;
-					case 's': //modify default (64) packet size
-						params.flags |= S;
-						get_packetsize(av, &i, j);
-						printf("packet opt size: %d\n", params.opts.packet_size);
-						opt = 0;
-						break;
-					case 'q': //quiet output (no display seq)
-						params.flags |= Q;
-						break;
-					default: //wrong opt
+					default:
 						printf("ping: Invalid option -- '%c'\n", av[i][j]);
 						return(help());
 				}
@@ -348,6 +203,7 @@ int parsing(int ac, char **av)
 		else
 		{
 			params.user_requested_address = av[i];
+			_checkOpt();
 			return (true);
 		}
 	}

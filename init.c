@@ -6,7 +6,7 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/28 20:03:27 by bahaas            #+#    #+#             */
-/*   Updated: 2021/07/29 18:53:45 by bahaas           ###   ########.fr       */
+/*   Updated: 2021/07/29 22:26:48 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@ static void	init_time()
 	params.time.total = 0;
 }
 
-//doesnt work with -c 4 www.42.fr cuz stuck on 4
 char	*get_host(int ac, char **av)
 {
 	for(int i = 1; i < ac; i++)	
@@ -40,18 +39,18 @@ void	init(int ac, char **av)
 {
 	init_time();
 	params.packet_size = 56;
-	if((params.flags & S))
+	if((params.flags & s))
 		params.packet_size = params.opts.packet_size;
 	params.sent_packets = 0;
 	params.received_packets = 0;
 	params.error_packets = 0;
 	params.interval = 0;
-	if(!(params.flags & F))
+	if(!(params.flags & f))
 		params.interval = 1;
-	if((params.flags & I))
+	if((params.flags & i))
 		params.interval = params.opts.interval;
 	params.ttl = 64;
-	if(params.flags & T)
+	if(params.flags & t)
 		params.ttl = params.opts.ttl;
 	params.process_id = getpid();
 	params.seq = 1;
@@ -59,33 +58,3 @@ void	init(int ac, char **av)
 	params.quit = 0;
 	ft_getadress(params.user_requested_address);
 }
-
-void	init_packet(struct s_packet *packet, struct timeval current_time)
-{
-	ft_bzero(packet, sizeof(t_packet));
-	packet->icmp_header.icmp_type = ICMP_ECHO;
-	packet->icmp_header.icmp_code = 0;
-	packet->icmp_header.icmp_seq = BSWAP16(params.seq);
-	packet->icmp_header.icmp_id = BSWAP16(params.process_id);
-	ft_memcpy(&packet->icmp_header.icmp_dun, &(current_time.tv_sec), sizeof(current_time.tv_sec));
-	//for(int i = 0; i < params.opts.packet_size; i++)
-	//	packet->icmp_header.icmp_data[i] = i;
-	//packet->icmp_header.icmp_cksum = 0;
-	packet->icmp_header.icmp_cksum = checksum(packet, sizeof(*packet));
-}
-
-
-void init_reply(t_reply *reply)
-{
-	ft_bzero(reply, sizeof(t_reply));
-	reply->iov.iov_base = reply->receive_buffer;
-	reply->iov.iov_len = sizeof(reply->receive_buffer);
-	reply->msghdr.msg_name = params.address;
-	//reply->msghdr.msg_namelen = ft_strlen(params.address);
-	reply->msghdr.msg_iov = &reply->iov;
-	reply->msghdr.msg_iovlen = 1;
-	reply->msghdr.msg_control = &reply->control;
-	reply->msghdr.msg_controllen = sizeof(reply->control);
-}
-
-

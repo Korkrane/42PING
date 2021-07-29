@@ -6,7 +6,7 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/23 18:06:43 by bahaas            #+#    #+#             */
-/*   Updated: 2021/07/29 19:06:09 by bahaas           ###   ########.fr       */
+/*   Updated: 2021/07/29 22:28:34 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,15 @@
 # define REPLY_ERROR		"ft_ping: reply is not what was expected (not ICMP)"
 # define TIMEOUT_ERROR		"ft_ping: recvmsg: request timed out"
 
+# define ERROR_I_OPT "ping: bad timing interval."
+# define ERROR_C_OPT "ping: bad number of packets to transmit."
+# define ERROR_L_OPT "ping: bad preload value, should be 1.65536"
+# define ERROR_W_OPT "ping: bad wait time." //only if negative and numeric, if letter there is no error tho
+# define ERROR_NEG_S_OPT "ping: illegal negative packet size" //-s letters = 0 by default return 8 bytes
+# define ERROR_MAX_S_OPT "Error: packet size %d is too large. Maximum is 65507"
+//idée : # define ERROR_MAX_S_OPT ("Error: packet size %d is too large. Maximum is 65507", packet_size)
+//si -s lettre set size packet a 0
+
 /*
 ** FUNCTION RETURN DEFINES
 */
@@ -62,18 +71,19 @@
 
 typedef enum e_flags
 {
-	V = 1 << 0,
+	v = 1 << 0,
 	D = 1 << 1,
-	I = 1 << 2,
-	N = 1 << 4,
-	H = 1 << 5,
-	F = 1 << 6,
-	L = 1 << 7,
-	T = 1 << 8,
-	A = 1 << 9,
-	W = 1 << 10,
-	Q = 1 << 11,
-	S = 1 << 12
+	i = 1 << 2,
+	n = 1 << 3,
+	H = 1 << 4,
+	f = 1 << 5,
+	l = 1 << 6,
+	t = 1 << 7,
+	a = 1 << 8,
+	w = 1 << 9,
+	q = 1 << 10,
+	s = 1 << 11,
+	c = 1 << 12
 }				t_flags;
 
 typedef struct				s_reply
@@ -154,7 +164,8 @@ void sig_int();
 void sig_quit();
 
 
-
+void add_no_params_opt(char opt);
+void add_params_opt(char **av, int *k, int j, int *flag);
 void	get_count(char **av, int *i, int j);
 void	get_interval(char **av, int *i, int j);
 void	get_preload(char **av, int *i, int j);
@@ -173,4 +184,12 @@ void	error_output(char *message);
 void print_stats();
 void set_rtt_stats(double rtt);
 double get_mdev();
+
+
+void create_socket(void);
+
+char			send_packet(t_packet *packet);
+
+
+void _checkOpt(); //TO DELETE
 #endif
