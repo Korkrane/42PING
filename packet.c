@@ -6,7 +6,7 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/29 22:23:15 by bahaas            #+#    #+#             */
-/*   Updated: 2021/07/30 15:06:48 by bahaas           ###   ########.fr       */
+/*   Updated: 2021/07/30 18:41:54 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,10 +27,7 @@ int			send_packet(t_packet *packet)
 		return (false);
 	}
 	if (params.flags & f)
-	{
-		ft_putchar_fd('.', 1);
-		fflush(stdout);
-	}
+		printf(".");
 	return (true);
 }
 
@@ -62,9 +59,9 @@ void	init_packet(struct s_packet *packet, struct timeval current_time)
 	packet->icmp_header.icmp_seq = BSWAP16(params.seq);
 	packet->icmp_header.icmp_id = BSWAP16(params.process_id);
 	ft_memcpy(&packet->icmp_header.icmp_dun, &(current_time.tv_sec), sizeof(current_time.tv_sec));
-	//for(int i = 0; i < params.opts.packet_size; i++)
-	//	packet->icmp_header.icmp_data[i] = i;
 	packet->icmp_header.icmp_cksum = 0;
 	packet->icmp_header.icmp_cksum = checksum(packet, sizeof(*packet));
+	//handle packet error here :)
+	//printf("sizeof(*packet): %ld\n", sizeof(*packet));
 	params.sent_packets++;
 }

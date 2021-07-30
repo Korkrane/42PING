@@ -6,7 +6,7 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/23 18:06:43 by bahaas            #+#    #+#             */
-/*   Updated: 2021/07/30 15:17:35 by bahaas           ###   ########.fr       */
+/*   Updated: 2021/07/30 18:42:29 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,14 +92,14 @@ typedef struct				s_reply
 	struct msghdr			msghdr;
 	struct iovec			iov;
 	struct icmp				*icmp;
-	char					receive_buffer[84];
+	char					receive_buffer[84]; //change for -s
 	char					control[CMSG_SPACE(sizeof(int))];
 }							t_reply;
 
 typedef struct				s_packet
 {
 	struct icmp				icmp_header;
-	char					data_buffer[36];
+	char					data_buffer[36]; //change for -s
 }							t_packet;
 
 typedef struct				s_time
