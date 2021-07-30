@@ -6,7 +6,7 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/23 18:06:43 by bahaas            #+#    #+#             */
-/*   Updated: 2021/07/29 22:28:34 by bahaas           ###   ########.fr       */
+/*   Updated: 2021/07/30 15:17:35 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,6 +118,7 @@ typedef struct				s_opt
 	int ttl;
 	double deadline;
 	int		packet_size;
+	char *bell;
 }							t_opts;
 
 typedef struct s_params
@@ -137,18 +138,17 @@ typedef struct s_params
 	int						error_packets;
 	int						seq;
 	struct sockaddr_in		sockaddr;
-	struct timeval			starting_time;
-	struct timeval			ending_time;
-	long					start;
-	long					end;
+	double					start;
+	double					end;
 	int						packet_size;
 	t_time					time;
+	t_reply					reply;
 
 }				t_params;
 
 
 t_params params;
-char	receive_reply(t_reply *reply);
+int	receive_reply(t_reply *reply);
 
 
 void			init_packet(struct s_packet *packet, struct timeval current_time);
@@ -156,7 +156,6 @@ void init_reply(t_reply *reply);
 void	init(int ac, char **av);
 
 void set_signal();
-void print_stats();
 
 void ft_getadress(char *host_name);
 unsigned short	checksum(void *address, int len);
@@ -181,14 +180,14 @@ void	set_time(struct timeval *destination);
 void	error_output_and_exit(char *message);
 void	error_output(char *message);
 
-void print_stats();
+int print_stats();
 void set_rtt_stats(double rtt);
 double get_mdev();
 
 
 void create_socket(void);
 
-char			send_packet(t_packet *packet);
+int			send_packet(t_packet *packet);
 
 
 void _checkOpt(); //TO DELETE

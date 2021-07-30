@@ -6,7 +6,7 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/29 19:05:15 by bahaas            #+#    #+#             */
-/*   Updated: 2021/07/29 19:05:32 by bahaas           ###   ########.fr       */
+/*   Updated: 2021/07/30 15:10:03 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ double get_mdev()
 	return (mdev);
 }
 
-void print_stats()
+int print_stats()
 {
 	long time;
 	double mdev;
@@ -46,4 +46,5 @@ void print_stats()
 	printf("\n--- %s ping statistics ---\n", params.reversed_address);
 	printf("%d packets transmitted, %d received, %d%% packet loss, time %ldms\n", params.sent_packets, params.received_packets, 0, time);
 	printf("rtt min/avg/max/mdev = %.3lf/%.3lf/%.3lf/%.3lf ms\n", params.time.min, params.time.avg, params.time.max, get_mdev());
+	return (true);
 }

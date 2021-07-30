@@ -6,7 +6,7 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/28 16:53:09 by bahaas            #+#    #+#             */
-/*   Updated: 2021/07/29 22:28:05 by bahaas           ###   ########.fr       */
+/*   Updated: 2021/07/30 15:28:20 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,17 @@ void ft_getadress(char *host_name)
 	params.address = ft_strdup(address);
 }
 
-void	display_sequence(int received_bytes, t_reply reply, struct timeval start_timestamp, struct timeval end_timestamp)
+void check_D_opt()
+{
+		if(params.flags & D)
+		{
+			struct timeval tv;
+			gettimeofday(&tv, NULL);
+			printf("[%ld.%ld]", tv.tv_sec, tv.tv_usec);
+		}
+}
+
+void	display_sequence(double start, double end, t_reply reply, struct timeval start_timestamp, struct timeval end_timestamp)
 {
 	short		reply_ttl;
 	double		time_elapsed;
@@ -68,36 +78,22 @@ void	display_sequence(int received_bytes, t_reply reply, struct timeval start_ti
 	packet_content = (struct ip *)reply.receive_buffer;
 	reply_ttl = (short)packet_content->ip_ttl;
 	time_elapsed = calculate_elapsed_time(start_timestamp, end_timestamp);
-	//time_elapsed = get_elapsed_time();
+	double time_elapss = end - start;
+	printf("time_elapsed tho: %lf\n", time_elapss);
 	if(!(params.flags & q))
 	{
-		if(params.flags & D) //bonus :)
-		{
-			struct timeval tv;
-			gettimeofday(&tv, NULL);
-			printf("[%ld.%ld]", tv.tv_sec, tv.tv_usec);
-		} // end bonus
-		char *bell;
-		bell = "";
-		if(params.flags & a)
-			bell = "\a";
+		check_D_opt();
 		if(!(params.flags & f))
 		{
 			if (ft_strcmp(params.address, params.user_requested_address) && !(params.flags & n))
-			{
-				printf("%lu bytes from %s (%s): icmp_seq=%d ttl=%d time=%.3lf ms%s\n", received_bytes - sizeof(struct ip),
-						params.reversed_address, params.address, params.seq, reply_ttl, time_elapsed, bell);
-			}
+				printf("%lu bytes from %s (%s): icmp_seq=%d ttl=%d time=%.3lf ms%s\n", reply.received_bytes - sizeof(struct ip),
+						params.reversed_address, params.address, params.seq, reply_ttl, time_elapsed, params.opts.bell);
 			else if(params.flags & n) //bonus -n
-			{
-				printf("%lu bytes from %s: icmp_seq=%d ttl=%d time=%.3lf ms%s\n", received_bytes - sizeof(struct ip),
-						params.address, params.seq, reply_ttl, time_elapsed, bell);
-			} // end bonus :)
+				printf("%lu bytes from %s: icmp_seq=%d ttl=%d time=%.3lf ms%s\n", reply.received_bytes - sizeof(struct ip),
+						params.address, params.seq, reply_ttl, time_elapsed, params.opts.bell);
 			else
-			{
-				printf("%lu bytes from %s: icmp_seq=%d ttl=%d time=%.3lf ms%s\n", received_bytes - sizeof(struct ip),
-						params.address, params.seq, reply_ttl, time_elapsed, bell);
-			}
+				printf("%lu bytes from %s: icmp_seq=%d ttl=%d time=%.3lf ms%s\n", reply.received_bytes - sizeof(struct ip),
+						params.address, params.seq, reply_ttl, time_elapsed, params.opts.bell);
 		}
 		else
 		{
@@ -123,53 +119,50 @@ void			wait_interval(struct timeval start)
 	}
 }
 
+int check_c_opt()
+{
+		if(params.opts.count)
+		{
+			params.opts.count--;
+			if(!params.opts.count)
+				return(print_stats());
+		}	
+		return (false);
+}
+
 void			ping_loop(void)
 {
 	t_packet			packet;
 	struct timeval		current_start_timestamp;
 	struct timeval		current_ending_timestamp;
-	t_reply				reply;
-	char				check;
+	double start;
+	double end;
 
-	printf("PING %s (%s) %d(%d) bytes of data.\n", params.reversed_address, params.address, params.packet_size, params.packet_size + 28);
-	params.start = get_time();
-	set_time(&params.starting_time);
-	while(params.quit == 0)
+	while(!params.quit)
 	{
+		start = get_time();
 		set_time(&current_start_timestamp);
 		init_packet(&packet, current_start_timestamp);
-		params.sent_packets++;
-		check = send_packet(&packet);
-		if (check == SUCCESS_CODE)
+		if (send_packet(&packet))
 		{
-			init_reply(&reply);
-			check = receive_reply(&reply);
-			if (check == SUCCESS_CODE)
+			init_reply(&params.reply);
+			if (receive_reply(&params.reply))
 			{
 				params.received_packets++;
+				end = get_time();
 				set_time(&current_ending_timestamp);
-				display_sequence(reply.received_bytes, reply, current_start_timestamp, current_ending_timestamp);;
+				display_sequence(start, end, params.reply, current_start_timestamp, current_ending_timestamp);;
 			}
-			else if (check == TTL_EXCEEDED_CODE)
+			else if (receive_reply(&params.reply) == TTL_EXCEEDED_CODE)
 			{
 				//		display_exceeded_sequence(reply);
 				//		params.error_packets++;
 			}
 		}
-		if(params.opts.count)
-		{
-			params.opts.count--;
-			if(!params.opts.count)
-			{
-				print_stats();
-				break;
-			}
-		}	
+		if(check_c_opt())
+			break;
 		params.seq++;
-		if(params.opts.preload - 1 > 0) //-l bonus :)
-			params.opts.preload--;
-		else
-			wait_interval(current_start_timestamp);
+		params.opts.preload - 1 > 0 ? params.opts.preload-- : wait_interval(current_start_timestamp);
 	}
 }
 
@@ -219,7 +212,11 @@ int		main(int ac, char **av)
 		if (params.address)
 			create_socket();
 		if (params.socket_fd != -1)
+		{
+			printf("PING %s (%s) %d(%d) bytes of data.\n", params.reversed_address, params.address, params.packet_size, params.packet_size + 28);
+			params.start = get_time();
 			ping_loop();
+		}
 	}
 	return (0);
 }

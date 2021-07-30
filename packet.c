@@ -6,13 +6,13 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/29 22:23:15 by bahaas            #+#    #+#             */
-/*   Updated: 2021/07/29 22:24:05 by bahaas           ###   ########.fr       */
+/*   Updated: 2021/07/30 15:06:48 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "includes/ft_ping.h"
 
-char			send_packet(t_packet *packet)
+int			send_packet(t_packet *packet)
 {
 	ssize_t sent_bytes;
 
@@ -24,14 +24,14 @@ char			send_packet(t_packet *packet)
 			error_output(NO_CONNEXION_ERROR);
 		else
 			error_output(SENDTO_ERROR);
-		return (ERROR_CODE);
+		return (false);
 	}
 	if (params.flags & f)
 	{
 		ft_putchar_fd('.', 1);
 		fflush(stdout);
 	}
-	return (SUCCESS_CODE);
+	return (true);
 }
 
 unsigned short	checksum(void *address, int len)
@@ -64,6 +64,7 @@ void	init_packet(struct s_packet *packet, struct timeval current_time)
 	ft_memcpy(&packet->icmp_header.icmp_dun, &(current_time.tv_sec), sizeof(current_time.tv_sec));
 	//for(int i = 0; i < params.opts.packet_size; i++)
 	//	packet->icmp_header.icmp_data[i] = i;
-	//packet->icmp_header.icmp_cksum = 0;
+	packet->icmp_header.icmp_cksum = 0;
 	packet->icmp_header.icmp_cksum = checksum(packet, sizeof(*packet));
+	params.sent_packets++;
 }

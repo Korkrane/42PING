@@ -6,7 +6,7 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/28 20:03:27 by bahaas            #+#    #+#             */
-/*   Updated: 2021/07/29 22:26:48 by bahaas           ###   ########.fr       */
+/*   Updated: 2021/07/30 15:17:19 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,9 @@ void	init(int ac, char **av)
 	params.packet_size = 56;
 	if((params.flags & s))
 		params.packet_size = params.opts.packet_size;
+	params.opts.bell = "";
+	if((params.flags & a))
+		params.opts.bell = "\a";
 	params.sent_packets = 0;
 	params.received_packets = 0;
 	params.error_packets = 0;
