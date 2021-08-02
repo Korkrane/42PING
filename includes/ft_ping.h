@@ -6,7 +6,7 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/23 18:06:43 by bahaas            #+#    #+#             */
-/*   Updated: 2021/07/30 18:42:29 by bahaas           ###   ########.fr       */
+/*   Updated: 2021/07/31 01:46:54 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #define FT_PING_H
 
 #include <unistd.h>
+#include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>

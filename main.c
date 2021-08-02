@@ -6,7 +6,7 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/28 16:53:09 by bahaas            #+#    #+#             */
-/*   Updated: 2021/07/30 18:42:02 by bahaas           ###   ########.fr       */
+/*   Updated: 2021/07/30 21:09:53 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -193,6 +193,8 @@ int parsing(int ac, char **av)
 
 int		main(int ac, char **av)
 {
+	if(getuid() != 0)
+		printf("Launch this command as root\n");
 	if (parsing(ac, av))
 	{
 		init(ac, av);
