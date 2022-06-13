@@ -3,65 +3,71 @@
 /*                                                        :::      ::::::::   */
 /*   packet.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
+/*   By: xubuntu <xubuntu@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/29 22:23:15 by bahaas            #+#    #+#             */
-/*   Updated: 2021/07/30 18:41:54 by bahaas           ###   ########.fr       */
+/*   Updated: 2022/06/13 09:45:09 by xubuntu          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "includes/ft_ping.h"
 
-int			send_packet(t_packet *packet)
+void print_packet(t_packet *packet)
 {
-	ssize_t sent_bytes;
-
-	sent_bytes = sendto(params.socket_fd, packet, sizeof(*packet), 0,
-			(struct sockaddr*)&params.sockaddr, sizeof(params.sockaddr));
-	if (sent_bytes <= 0)
-	{
-		if (errno == ENETUNREACH)
-			error_output(NO_CONNEXION_ERROR);
-		else
-			error_output(SENDTO_ERROR);
-		return (false);
-	}
-	if (params.flags & f)
-		printf(".");
-	return (true);
+    printf("data_buffer %s\n", packet->data_buffer);
 }
 
-unsigned short	checksum(void *address, int len)
+int send_packet(t_packet *packet)
 {
-	unsigned short	*buff;
-	unsigned long	sum;
+    ssize_t sent_bytes;
 
-	buff = (unsigned short *)address;
-	sum = 0;
-	while (len > 1)
-	{
-		sum += *buff;
-		buff++;
-		len -= sizeof(unsigned short);
-	}
-	if (len)
-		sum += *(unsigned char *)buff;
-	sum = (sum >> 16) + (sum & 0xFFFF);
-	sum += (sum >> 16);
-	return ((unsigned short)~sum);
+    print_packet(packet);
+    sent_bytes = sendto(params.socket_fd, packet, sizeof(*packet), 0,
+                        (struct sockaddr *)&params.sockaddr, sizeof(params.sockaddr));
+    if (sent_bytes <= 0)
+    {
+        if (errno == ENETUNREACH)
+            error_output(NO_CONNEXION_ERROR);
+        else
+            error_output(SENDTO_ERROR);
+        return (false);
+    }
+    if (params.flags & f)
+        printf(".");
+    return (true);
 }
 
-void	init_packet(struct s_packet *packet, struct timeval current_time)
+unsigned short checksum(void *address, int len)
 {
-	ft_bzero(packet, sizeof(t_packet));
-	packet->icmp_header.icmp_type = ICMP_ECHO;
-	packet->icmp_header.icmp_code = 0;
-	packet->icmp_header.icmp_seq = BSWAP16(params.seq);
-	packet->icmp_header.icmp_id = BSWAP16(params.process_id);
-	ft_memcpy(&packet->icmp_header.icmp_dun, &(current_time.tv_sec), sizeof(current_time.tv_sec));
-	packet->icmp_header.icmp_cksum = 0;
-	packet->icmp_header.icmp_cksum = checksum(packet, sizeof(*packet));
-	//handle packet error here :)
-	//printf("sizeof(*packet): %ld\n", sizeof(*packet));
-	params.sent_packets++;
+    unsigned short *buff;
+    unsigned long sum;
+
+    buff = (unsigned short *)address;
+    sum = 0;
+    while (len > 1)
+    {
+        sum += *buff;
+        buff++;
+        len -= sizeof(unsigned short);
+    }
+    if (len)
+        sum += *(unsigned char *)buff;
+    sum = (sum >> 16) + (sum & 0xFFFF);
+    sum += (sum >> 16);
+    return ((unsigned short)~sum);
+}
+
+void init_packet(struct s_packet *packet, struct timeval current_time)
+{
+    ft_bzero(packet, sizeof(t_packet));
+    packet->icmp_header.icmp_type = ICMP_ECHO;
+    packet->icmp_header.icmp_code = 0;
+    packet->icmp_header.icmp_seq = BSWAP16(params.seq);
+    packet->icmp_header.icmp_id = BSWAP16(params.process_id);
+    ft_memcpy(&packet->icmp_header.icmp_dun, &(current_time.tv_sec), sizeof(current_time.tv_sec));
+    packet->icmp_header.icmp_cksum = 0;
+    packet->icmp_header.icmp_cksum = checksum(packet, sizeof(*packet));
+    // handle packet error here :)
+    // printf("sizeof(*packet): %ld\n", sizeof(*packet));
+    params.sent_packets++;
 }
