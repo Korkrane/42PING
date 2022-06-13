@@ -1,0 +1,14 @@
+exit
+fprintf
+getaddrinfo
+getpid
+gettimeofday
+inet_ntop
+malloc
+printf
+recvmsg
+sendto
+setsockopt
+signal
+socket
+sqrt
