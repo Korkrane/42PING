@@ -3,33 +3,28 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strnstr.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
+/*   By: clorin <clorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/09/16 22:52:13 by bahaas            #+#    #+#             */
-/*   Updated: 2020/11/16 18:54:49 by bahaas           ###   ########.fr       */
+/*   Created: 2020/09/18 10:49:52 by clorin            #+#    #+#             */
+/*   Updated: 2020/09/18 10:54:22 by clorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-char	*ft_strnstr(const char *big, const char *little, size_t len)
+char		*ft_strnstr(const char *str, const char *substr, size_t len)
 {
-	size_t		i;
-	size_t		j;
+	size_t		len_substr;
 
-	i = 0;
-	if (*little == '\0')
-		return ((char *)big);
-	while (big[i] && i < len)
+	if (!*substr)
+		return ((char *)str);
+	len_substr = ft_strlen(substr);
+	while (*str && len >= len_substr)
 	{
-		j = 0;
-		while (big[j + i] == little[j] && i + j < len)
-		{
-			j++;
-			if (little[j] == '\0')
-				return ((char *)&big[i]);
-		}
-		i++;
+		if (*str == *substr && ft_memcmp(str, substr, len_substr) == 0)
+			return ((char *)str);
+		str++;
+		len--;
 	}
 	return (NULL);
 }

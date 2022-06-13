@@ -3,90 +3,99 @@
 /*                                                        :::      ::::::::   */
 /*   ft_split.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
+/*   By: clorin <clorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/11/07 01:10:48 by bahaas            #+#    #+#             */
-/*   Updated: 2021/05/27 19:55:30 by bahaas           ###   ########.fr       */
+/*   Created: 2020/09/22 15:24:16 by clorin            #+#    #+#             */
+/*   Updated: 2020/09/22 15:50:15 by clorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-static int	count_words(char *str, char c)
+static char		*ft_strndup_split(const char *s, size_t n)
 {
-	int	i;
-	int	w_len;
-	int	count_w;
+	char		*str;
+	size_t		i;
 
 	i = 0;
-	count_w = 0;
+	str = (char *)malloc(sizeof(char) * n + 1);
+	if (!str)
+		return (NULL);
+	ft_bzero(str, n + 1);
+	while (s[i] && i < n)
+	{
+		str[i] = s[i];
+		i++;
+	}
+	return (str);
+}
+
+static int		nb_word(char const *str, char c)
+{
+	size_t		i;
+	int			cmpt;
+
+	i = 0;
+	cmpt = 0;
 	while (str[i])
 	{
-		while (str[i] && str[i] == c)
+		while (str[i] == c)
 			i++;
-		w_len = 0;
+		if (str[i])
+			cmpt++;
 		while (str[i] && str[i] != c)
-		{
-			w_len++;
 			i++;
+	}
+	return (cmpt);
+}
+
+static void		free_split(char **dest, int y)
+{
+	while (y >= 0)
+	{
+		free(dest[y]);
+		y--;
+	}
+	free(dest);
+}
+
+static char		**ft_fill_words(char **dest, char const *s, char c)
+{
+	int			i;
+	int			y;
+	int			j;
+
+	i = 0;
+	y = 0;
+	while (s[i])
+	{
+		while (s[i] == c)
+			i++;
+		j = i;
+		while (s[i] && s[i] != c)
+			i++;
+		if (i > j)
+		{
+			dest[y++] = ft_strndup_split(s + j, i - j);
+			if (!dest[y - 1])
+			{
+				free_split(dest, y - 2);
+				return (NULL);
+			}
 		}
-		if (w_len)
-			count_w++;
 	}
-	return (count_w);
+	dest[y] = NULL;
+	return (dest);
 }
 
-static char	*ft_strncat(char *str, char *new_str, int n)
+char			**ft_split(char const *s, char c)
 {
-	int	i;
-
-	i = 0;
-	while (str[i] && i < n)
-	{
-		new_str[i] = str[i];
-		i++;
-	}
-	new_str[i] = '\0';
-	return (new_str);
-}
-
-static char	**ft_create(char **split, char c, int count_w, char *str)
-{
-	int	i;
-	int	j;
-	int	w_len;
-
-	i = 0;
-	j = 0;
-	while (i < count_w)
-	{
-		while (str[j] && str[j] == c)
-			j++;
-		w_len = 0;
-		while (str[j + w_len] && str[j + w_len] != c)
-			w_len++;
-		split[i] = malloc(sizeof(char *) * w_len + 1);
-		if (!split[i])
-			return (NULL);
-		ft_strncat(&str[j], split[i], w_len);
-		j += w_len;
-		i++;
-	}
-	return (split);
-}
-
-char	**ft_split(char const *s, char c)
-{
-	int		count_w;
-	char	**split;
+	char		**dest;
 
 	if (!s)
 		return (NULL);
-	count_w = count_words((char *)s, c);
-	split = malloc(sizeof(char *) * (count_w + 1));
-	if (!split)
+	dest = (char **)malloc(sizeof(char *) * (nb_word(s, c) + 1));
+	if (!dest)
 		return (NULL);
-	split = ft_create(split, c, count_w, (char *)s);
-	split[count_w] = 0;
-	return (split);
+	return (ft_fill_words(dest, s, c));
 }

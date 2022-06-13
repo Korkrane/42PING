@@ -6,7 +6,7 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/29 19:00:52 by bahaas            #+#    #+#             */
-/*   Updated: 2021/07/29 19:01:43 by bahaas           ###   ########.fr       */
+/*   Updated: 2022/06/09 20:07:53 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,4 +43,3 @@ void			set_time(struct timeval *destination)
 	if (gettimeofday(destination, NULL) == -1)
 		error_output_and_exit(TIMEOFDAY_ERROR);
 }
-

@@ -1,19 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_free.c                                          :+:      :+:    :+:   */
+/*   ft_strcat.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
+/*   By: clorin <clorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/02/04 18:36:42 by bahaas            #+#    #+#             */
-/*   Updated: 2021/02/25 18:07:44 by bahaas           ###   ########.fr       */
+/*   Created: 2020/09/17 15:19:27 by clorin            #+#    #+#             */
+/*   Updated: 2020/09/17 15:21:07 by clorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-void	ft_free(void *content_to_free)
+char		*ft_strcat(char *dest, const char *src)
 {
-	free(content_to_free);
-	content_to_free = NULL;
+	return (ft_strncat(dest, src, ft_strlen(src)));
 }

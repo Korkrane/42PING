@@ -3,68 +3,59 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strjoin.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
+/*   By: clorin <clorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/09/16 22:52:12 by bahaas            #+#    #+#             */
-/*   Updated: 2021/05/27 20:04:39 by bahaas           ###   ########.fr       */
+/*   Created: 2020/09/22 13:10:47 by clorin            #+#    #+#             */
+/*   Updated: 2020/09/22 13:27:21 by clorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-static int	ft_tot_len(char const *s1, char const *s2)
+static char	*ft_strcpy_join(char *dest, const char *src)
 {
-	int	tot_len;
-
-	tot_len = 0;
-	tot_len += ft_strlen(s1) + ft_strlen(s2);
-	return (tot_len);
-}
-
-static char	*ft_strcat(char *dest, char const *src)
-{
-	int	i;
-	int	j;
+	size_t	i;
 
 	i = 0;
-	j = 0;
-	while (dest[i])
-		i++;
-	while (src[j])
+	while (src[i])
 	{
-		dest[i + j] = src[j];
-		j++;
+		dest[i] = src[i];
+		i++;
 	}
-	dest[i + j] = '\0';
+	dest[i] = 0;
 	return (dest);
 }
 
-static void	ft_create(char *newstr, char const *s1, char const *s2)
+static char	*ft_strncat_join(char *dest, const char *src, size_t n)
 {
-	ft_strcat(newstr, s1);
-	ft_strcat(newstr, s2);
+	size_t	i;
+	size_t	j;
+
+	i = 0;
+	while (dest[i])
+		i++;
+	j = 0;
+	while (src[j] && j < n)
+		dest[i++] = src[j++];
+	dest[i] = 0;
+	return (dest);
 }
 
-char	*ft_strjoin(char const *s1, char const *s2)
+char		*ft_strjoin(char const *s1, char const *s2)
 {
-	char	*fillstr;
-	int		tot_len;
-	char	*emptystr;
+	char	*str;
+	size_t	len_s1_s2;
+	size_t	i;
 
+	i = 0;
 	if (!s1 || !s2)
 		return (NULL);
-	tot_len = ft_tot_len(s1, s2);
-	if (tot_len == 0)
-	{
-		emptystr = malloc(sizeof(char) * 1);
-		emptystr[0] = '\0';
-		return (emptystr);
-	}
-	fillstr = malloc(sizeof(char) * tot_len + 1);
-	if (!fillstr)
+	len_s1_s2 = ft_strlen(s1) + ft_strlen(s2) + 1;
+	str = (char *)malloc(sizeof(char) * (len_s1_s2));
+	if (!str)
 		return (NULL);
-	fillstr[0] = '\0';
-	ft_create(fillstr, s1, s2);
-	fillstr[tot_len] = '\0';
-	return (fillstr);
+	ft_bzero(str, len_s1_s2);
+	ft_strcpy_join(str, s1);
+	ft_strncat_join(str, s2, ft_strlen(s2));
+	return (str);
 }

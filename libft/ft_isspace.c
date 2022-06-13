@@ -1,27 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_free_strs.c                                     :+:      :+:    :+:   */
+/*   ft_isspace.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
+/*   By: clorin <clorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/05/12 01:10:43 by bahaas            #+#    #+#             */
-/*   Updated: 2021/05/27 20:11:33 by bahaas           ###   ########.fr       */
+/*   Created: 2020/09/18 12:01:15 by clorin            #+#    #+#             */
+/*   Updated: 2020/09/18 12:02:19 by clorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-void	ft_free_strs(char ***strs)
+int		ft_isspace(int ch)
 {
-	int	i;
-
-	i = -1;
-	while ((*strs)[++i])
-	{
-		free((*strs)[i]);
-		(*strs)[i] = NULL;
-	}
-	free(*strs);
-	*strs = NULL;
+	if (ch == '\t' || ch == '\n' || ch == '\v' ||
+		ch == '\f' || ch == '\r' || ch == ' ')
+		return (1);
+	else
+		return (0);
 }

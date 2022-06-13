@@ -3,18 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   ft_isprint.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
+/*   By: clorin <clorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/10/13 19:51:56 by bahaas            #+#    #+#             */
-/*   Updated: 2021/05/27 19:57:14 by bahaas           ###   ########.fr       */
+/*   Created: 2020/09/18 12:16:33 by clorin            #+#    #+#             */
+/*   Updated: 2020/09/18 12:17:40 by clorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-int	ft_isprint(int c)
+int		ft_isprint(int ch)
 {
-	if (c >= 32 && c < 127)
-		return (1);
-	return (0);
+	return (ch >= ' ' && ch <= '~');
 }
