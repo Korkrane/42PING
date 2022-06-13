@@ -6,24 +6,20 @@
 /*   By: xubuntu <xubuntu@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/28 16:53:09 by bahaas            #+#    #+#             */
-/*   Updated: 2022/06/13 09:42:11 by xubuntu          ###   ########.fr       */
+/*   Updated: 2022/06/13 13:21:09 by xubuntu          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "includes/ft_ping.h"
 
-static int help()
+int help()
 {
-    printf("Usage: ping [-aAbBdDfhLnOqrRUvV64] [-c count] [-i interval] [-I interface]\n"
-           "\t    [-m mark] [-M pmtudisc_option] [-l preload] [-p pattern] [-Q tos]\n"
-           "\t    [-s packetsize] [-S sndbuf] [-t ttl] [-T timestamp_option]\n"
-           "\t    [-w deadline] [-W timeout] [hop1 ...] destination\n");
-    printf("Usage: ping -6 [-aAbBdDfhLnOqrRUvV64] [-c count] [-i interval] [-I interface]\n"
-           "\t     [-l preload] [-m mark] [-M pmtudisc_option]\n"
-           "\t     [-N nodeinfo_option] [-p pattern] [-Q tclass] [-s packetsize]\n"
-           "\t     [-S sndbuf] [-t ttl] [-T timestamp_option] [-w deadline]\n"
-           "\t     [-W timeout] destination\n");
-    return (0);
+    fprintf(stderr, "\nUsage\n  ping [options] <destination>\n"
+                    "\nOptions:\n"
+                    "  <destinaton>\t     dns name or ip address\n"
+                    "  -h\t\t     print help and exit\n"
+                    "  -v\t\t     verbose output\n");
+    return 0;
 }
 
 void error_output(char *message)
@@ -49,8 +45,10 @@ void ft_getadress(char *host_name)
     hints.ai_flags = AI_CANONNAME;
     if (getaddrinfo(host_name, NULL, &hints, &res) != 0)
     {
-        printf("error in getaddress\n");
-        return;
+        // printf("error in getaddress\n");
+        // return;
+        fprintf(stderr, "ping: %s: Name or service not known\n", host_name);
+        exit(2);
     }
     params.reversed_address = res->ai_canonname;
     ft_memcpy(&params.sockaddr, res->ai_addr, sizeof(struct sockaddr_in));
@@ -82,13 +80,13 @@ void display_sequence(t_reply reply, double time)
         if (!(params.flags & f))
         {
             if (ft_strcmp(params.address, params.user_requested_address) && !(params.flags & n))
-                printf("%lu bytes from %s (%s): icmp_seq=%d ttl=%d time=%.3lf ms%s\n", reply.received_bytes - sizeof(struct ip),
+                printf("%lu bytes from %s (%s): icmp_seq=%d ttl=%d time=%.2lf ms%s\n", reply.received_bytes - sizeof(struct ip),
                        params.reversed_address, params.address, params.seq, reply_ttl, time, params.opts.bell);
             else if (params.flags & n) // bonus -n
-                printf("%lu bytes from %s: icmp_seq=%d ttl=%d time=%.3lf ms%s\n", reply.received_bytes - sizeof(struct ip),
+                printf("%lu bytes from %s: icmp_seq=%d ttl=%d time=%.2lf ms%s\n", reply.received_bytes - sizeof(struct ip),
                        params.address, params.seq, reply_ttl, time, params.opts.bell);
             else
-                printf("%lu bytes from %s: icmp_seq=%d ttl=%d time=%.3lf ms%s\n", reply.received_bytes - sizeof(struct ip),
+                printf("%lu bytes from %s: icmp_seq=%d ttl=%d time=%.2lf ms%s\n", reply.received_bytes - sizeof(struct ip),
                        params.address, params.seq, reply_ttl, time, params.opts.bell);
         }
         else
@@ -142,11 +140,12 @@ void print_params()
 
 void ping_loop(void)
 {
+
     t_packet packet;
     struct timeval start;
     struct timeval end;
 
-    print_params();
+    // print_params();
     while (!params.quit)
     {
         set_time(&start);
@@ -173,10 +172,31 @@ void ping_loop(void)
     }
 }
 
+// options list
+//  -v verbose
+//  -h help
+
+// -D timestamp before each line
+// -n numeric output only
+// -f flood ping with .
+// -a bell
+// -q quiet
+
+// -c count request
+// -i interval between send
+// -l preload packets before anszer
+// -t ttl
+// -w timeout before end of ping
+// -s packetsize
+
+// f & i not handled probably
 int parsing(int ac, char **av)
 {
     if (ac < 2)
-        return (help());
+    {
+        fprintf(stderr, "ping: usage error: Destination address required\n");
+        exit(1);
+    }
     for (int i = 1; i < ac; i++)
     {
         if (av[i][0] == '-')
@@ -213,7 +233,7 @@ int parsing(int ac, char **av)
         else
         {
             params.user_requested_address = av[i];
-            _checkOpt();
+            _checkOpt(); // for params
             return (true);
         }
     }
@@ -224,19 +244,27 @@ int main(int ac, char **av)
 {
     if (parsing(ac, av))
     {
-        init(ac, av);
-        set_signal();
-        if (params.address)
-            create_socket();
-        if (params.socket_fd != -1)
+        if (!params.user_requested_address)
         {
-            printf("PING %s (%s) %d(%d) bytes of data.\n",
-                   params.reversed_address,
-                   params.address,
-                   params.packet_size,
-                   params.packet_size + 28);
-            params.start = get_time();
-            ping_loop();
+            fprintf(stderr, "Dping: usage error: Destination address required\n");
+            exit(2);
+        }
+        else
+        {
+            init(ac, av);
+            set_signal();
+            if (params.address)
+                create_socket();
+            if (params.socket_fd != -1)
+            {
+                printf("PING %s (%s) %d(%d) bytes of data.\n",
+                       params.reversed_address,
+                       params.address,
+                       params.packet_size,
+                       params.packet_size + 28);
+                params.start = get_time();
+                ping_loop();
+            }
         }
     }
     return (0);

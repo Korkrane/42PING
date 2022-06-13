@@ -6,7 +6,7 @@
 /*   By: xubuntu <xubuntu@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/29 22:23:15 by bahaas            #+#    #+#             */
-/*   Updated: 2022/06/13 09:45:09 by xubuntu          ###   ########.fr       */
+/*   Updated: 2022/06/13 12:53:07 by xubuntu          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ int send_packet(t_packet *packet)
 {
     ssize_t sent_bytes;
 
-    print_packet(packet);
+    // print_packet(packet);
     sent_bytes = sendto(params.socket_fd, packet, sizeof(*packet), 0,
                         (struct sockaddr *)&params.sockaddr, sizeof(params.sockaddr));
     if (sent_bytes <= 0)
