@@ -3,17 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
+/*   By: clorin <clorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/11/12 13:07:08 by bahaas            #+#    #+#             */
-/*   Updated: 2021/05/27 20:19:37 by bahaas           ###   ########.fr       */
+/*   Created: 2020/10/21 09:54:36 by clorin            #+#    #+#             */
+/*   Updated: 2020/11/24 10:59:37 by clorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
-#include "get_next_line.h"
 
-static int	check_line(char *str)
+/*
+**	returns 1 if there is '\n' in the string
+**	otherwise return 0
+*/
+
+static int			nl_line(char *str)
 {
 	int				i;
 
@@ -29,7 +33,11 @@ static int	check_line(char *str)
 	return (0);
 }
 
-static char	*grep_line(char *str)
+/*
+**	return a malloc string from the first line of str or str if none '\ n'
+*/
+
+static char			*recup_line(char *str)
 {
 	int				i;
 	char			*dest;
@@ -56,10 +64,19 @@ static char	*grep_line(char *str)
 	return (dest);
 }
 
-static char	*store_leftover(char *str, int i, int j)
+/*
+**	Remove the first line encountered and return a malloc
+**  from the rest of the chain
+**	free the old str
+*/
+
+static char			*save_static(char *str)
 {
+	int				i;
+	int				j;
 	char			*dest;
 
+	i = 0;
 	if (!str)
 		return (NULL);
 	while (str[i] && str[i] != '\n')
@@ -69,6 +86,7 @@ static char	*store_leftover(char *str, int i, int j)
 		free(str);
 		return (NULL);
 	}
+	j = 0;
 	dest = (char *)malloc(sizeof(char) * (ft_strlen(str) - i));
 	if (!dest)
 		return (NULL);
@@ -76,36 +94,64 @@ static char	*store_leftover(char *str, int i, int j)
 	while (str[i])
 		dest[j++] = str[i++];
 	dest[j] = '\0';
-	if (dest[0] == '\0')
-	{
-		free(dest);
-		dest = NULL;
-	}
 	free(str);
 	return (dest);
 }
 
-int	get_next_line(const int fd, char **line)
-{
-	static char		*leftover;
-	char			buf[BUFFER_SIZE + 1];
-	int				ret;
+/*
+**	check the inputs of get_next_line()
+**	and free buffer if not valid inputs
+*/
 
-	if (BUFFER_SIZE <= 0 || fd < 0 || !line || read(fd, buf, 0) < 0)
-		return (-1);
-	ret = 1;
-	while (!check_line(leftover) && ret != 0)
+static int			check_input(char *buffer, const int fd, char **line)
+{
+	if (fd < 0 || fd > MAX_FD || !line || BUFFER_SIZE <= 0 || !buffer ||
+	read(fd, NULL, 0) < 0)
 	{
-		ret = read(fd, buf, BUFFER_SIZE);
-		if (ret == -1)
-			return (-1);
-		buf[ret] = '\0';
-		leftover = ft_strjoin(leftover, buf);
+		if (buffer)
+			free(buffer);
+		return (0);
 	}
-	*line = grep_line(leftover);
-	leftover = store_leftover(leftover, 0, 0);
-	ret = 1;
-	if (ret == 0 && ft_strlen(leftover) == 0)
-		ret = 0;
-	return (ret);
+	return (1);
+}
+
+/*
+**	1# We check fd, line and buffer_size: return -1 if problems.
+**	2# We allocate a buffer of the size of buffer_size.
+**	3# As long as str_static does not contain a '\ n'
+***		and the read has not returned 0(result)
+**		- we read a packet of BUFFER_SIZE oct.
+**		- we add this package to the static variable.
+**	4# we get the line to send back.
+**	5# we trunk the static variable of the returned row.
+**	6# If the reading returned 0 and static variable empty,
+**		we returned 0, otherwise 1 because there is still something to read.
+*/
+
+int					get_next_line(const int fd, char **line)
+{
+	static char		*str_static[MAX_FD];
+	char			*buffer;
+	int				result;
+
+	buffer = (char *)malloc(sizeof(char) * (BUFFER_SIZE + 1));
+	if (!check_input(buffer, fd, line))
+		return (-1);
+	result = 1;
+	while (!nl_line(str_static[fd]) && result != 0)
+	{
+		result = read(fd, buffer, BUFFER_SIZE);
+		if (result == -1)
+		{
+			free(buffer);
+			return (-1);
+		}
+		buffer[result] = '\0';
+		str_static[fd] = strjoin_gnl(str_static[fd], buffer);
+	}
+	free(buffer);
+	*line = recup_line(str_static[fd]);
+	str_static[fd] = save_static(str_static[fd]);
+	result = (result == 0 && ft_strlen(str_static[fd]) == 0) ? 0 : 1;
+	return (result);
 }

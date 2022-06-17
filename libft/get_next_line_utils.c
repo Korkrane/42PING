@@ -3,53 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line_utils.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
+/*   By: clorin <clorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/11/12 13:24:58 by bahaas            #+#    #+#             */
-/*   Updated: 2021/05/27 19:59:15 by bahaas           ###   ########.fr       */
+/*   Created: 2020/10/29 17:18:56 by clorin            #+#    #+#             */
+/*   Updated: 2020/10/29 17:18:59 by clorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
-#include "get_next_line.h"
 
-char	*ft_strnew(size_t size)
-{
-	char		*str;
-	size_t		i;
-
-	if (size <= 0)
-		return (NULL);
-	str = (char *)malloc(sizeof(char) * (size + 1));
-	if (!str)
-		return (NULL);
-	i = 0;
-	while (i <= size)
-		str[i++] = '\0';
-	return (str);
-}
-
-void	*ft_memmove(void *dest, const void *src, size_t len)
-{
-	char		*d;
-	char		*s;
-
-	d = (char *)dest;
-	s = (char *)src;
-	if (dest == src)
-		return (dest);
-	if (s < d)
-	{
-		while (len--)
-			*(d + len) = *(s + len);
-		return (dest);
-	}
-	while (len--)
-		*d++ = *s++;
-	return (dest);
-}
-
-char	*ft_strjoin(char const *s1, char const *s2)
+char			*strjoin_gnl(char const *s1, char const *s2)
 {
 	char		*dest;
 	int			size_s1;

@@ -1,27 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_free_strs.c                                     :+:      :+:    :+:   */
+/*   ft_putchar.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
+/*   By: clorin <clorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/05/12 01:10:43 by bahaas            #+#    #+#             */
-/*   Updated: 2021/05/27 20:11:33 by bahaas           ###   ########.fr       */
+/*   Created: 2020/09/15 14:42:09 by clorin            #+#    #+#             */
+/*   Updated: 2020/09/15 14:42:11 by clorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-void	ft_free_strs(char ***strs)
+void		ft_putchar(char c)
 {
-	int	i;
-
-	i = -1;
-	while ((*strs)[++i])
-	{
-		free((*strs)[i]);
-		(*strs)[i] = NULL;
-	}
-	free(*strs);
-	*strs = NULL;
+	ft_putchar_fd(c, 1);
 }

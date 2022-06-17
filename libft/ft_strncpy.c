@@ -1,39 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_isnumb.c                                        :+:      :+:    :+:   */
+/*   ft_strncpy.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
+/*   By: clorin <clorin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/03/04 17:58:48 by bahaas            #+#    #+#             */
-/*   Updated: 2021/05/27 19:56:04 by bahaas           ###   ########.fr       */
+/*   Created: 2020/09/17 14:41:55 by clorin            #+#    #+#             */
+/*   Updated: 2020/09/17 14:42:16 by clorin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-int	ft_isnumb(char *num)
+char		*ft_strncpy(char *dest, const char *src, size_t n)
 {
-	int	i;
+	size_t		i;
 
 	i = 0;
-	if (num[i] != '\0')
+	while (src[i] && i < n)
 	{
-		while (num[i])
-		{
-			if (num[i] == '+' || num[i] == '-')
-				i++;
-			else
-				break ;
-		}
-		while (num[i])
-		{
-			if (ft_isdigit(num[i]))
-				i++;
-			else
-				return (0);
-		}
-		return (1);
+		dest[i] = src[i];
+		i++;
 	}
-	return (0);
+	while (i < n)
+	{
+		dest[i] = 0;
+		i++;
+	}
+	return (dest);
 }
