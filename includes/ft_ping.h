@@ -6,7 +6,7 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/23 18:06:43 by bahaas            #+#    #+#             */
-/*   Updated: 2022/06/17 13:59:47 by bahaas           ###   ########.fr       */
+/*   Updated: 2022/06/17 17:28:18 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,7 +162,7 @@ unsigned short checksum(void *address, int len);
 
 void add_no_params_opt(char opt);
 void add_params_opt(char **av, int *k, int j, int *flag);
-void get_count(char **av, int *i, int j);
+long long get_count(char **av, int *i, int j, long long min_limit, long long max_limit);
 void get_interval(char **av, int *i, int j);
 void get_preload(char **av, int *i, int j);
 void get_ttl(char **av, int *i, int j);

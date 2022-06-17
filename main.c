@@ -6,7 +6,7 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/28 16:53:09 by bahaas            #+#    #+#             */
-/*   Updated: 2022/06/17 13:59:19 by bahaas           ###   ########.fr       */
+/*   Updated: 2022/06/17 14:30:41 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -211,12 +211,12 @@ int parsing(int ac, char **av)
                     break;
                 case 'h':
                     return (help());
+                    // case 'i':
+                    // case 'l':
+                    // case 't':
+                    // case 's':
                 case 'c':
-                case 'i':
-                case 'l':
-                case 't':
                 case 'w':
-                case 's':
                     add_params_opt(av, &i, j, &flag);
                     break;
                 default:
