@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_ping.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/23 18:06:43 by bahaas            #+#    #+#             */
-/*   Updated: 2022/06/17 13:30:06 by marvin           ###   ########.fr       */
+/*   Updated: 2022/06/17 13:59:47 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,12 +153,12 @@ void init_packet(struct s_packet *packet, struct timeval current_time);
 void init_reply(t_reply *reply);
 void init();
 
-void set_signal();
+void initSignal();
+void sig_int();
+void sig_quit();
 
 void ft_getadress(char *host_name);
 unsigned short checksum(void *address, int len);
-void sig_int();
-void sig_quit();
 
 void add_no_params_opt(char opt);
 void add_params_opt(char **av, int *k, int j, int *flag);
@@ -174,12 +174,12 @@ double get_elapsed_time(double starter);
 double calculate_elapsed_time(struct timeval start, struct timeval end);
 void set_time(struct timeval *destination);
 
-void add_options_modification();
+void addOptionsModifications();
 int print_stats();
 void set_rtt_stats(double rtt);
 double get_mdev();
 
-void create_socket(void);
+void createSocket();
 
 int send_packet(t_packet *packet);
 

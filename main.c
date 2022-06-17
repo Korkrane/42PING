@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/28 16:53:09 by bahaas            #+#    #+#             */
-/*   Updated: 2022/06/17 13:42:09 by marvin           ###   ########.fr       */
+/*   Updated: 2022/06/17 13:59:19 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,13 +127,22 @@ void print_params()
     printf("packet_size %d\n", params.packet_size);
 }
 
-void ping_loop(void)
+void ping(void)
 {
 
     t_packet packet;
     struct timeval start;
     struct timeval end;
 
+    if (params.socket_fd == -1)
+        return;
+
+    printf("PING %s (%s) %d(%d) bytes of data.\n",
+           params.reversed_address,
+           params.address,
+           params.packet_size,
+           params.packet_size + 28);
+    params.start = get_time();
     // print_params();
     while (!params.quit)
     {
@@ -221,15 +230,12 @@ int parsing(int ac, char **av)
             params.user_requested_address = av[i];
             ft_getadress(params.user_requested_address);
             _checkOpt(); // for params
-            add_options_modification();
+            addOptionsModifications();
             return (true);
         }
     }
     if (!params.user_requested_address)
-    {
-        fprintf(stderr, "ft_ping: usage error: Destination address required\n");
-        exit(2);
-    }
+        ft_printerr_exit("ft_ping: usage error: Destination address required", 2);
     return (true);
 }
 
@@ -238,19 +244,9 @@ int main(int ac, char **av)
     init();
     if (parsing(ac, av))
     {
-        set_signal();
-        if (params.address)
-            create_socket();
-        if (params.socket_fd != -1)
-        {
-            printf("PING %s (%s) %d(%d) bytes of data.\n",
-                   params.reversed_address,
-                   params.address,
-                   params.packet_size,
-                   params.packet_size + 28);
-            params.start = get_time();
-            ping_loop();
-        }
+        initSignal();
+        createSocket();
+        ping();
     }
     return (0);
 }

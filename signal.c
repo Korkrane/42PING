@@ -6,7 +6,7 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/28 20:09:38 by bahaas            #+#    #+#             */
-/*   Updated: 2021/07/28 20:11:31 by bahaas           ###   ########.fr       */
+/*   Updated: 2022/06/17 13:59:28 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ void sig_quit()
 	params.quit = 1;
 }
 
-void set_signal()
+void initSignal()
 {
 	signal(SIGINT, &sig_int);
 	signal(SIGQUIT, &sig_quit);
