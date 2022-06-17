@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: xubuntu <xubuntu@student.42.fr>            +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/28 16:53:09 by bahaas            #+#    #+#             */
-/*   Updated: 2022/06/13 13:21:09 by xubuntu          ###   ########.fr       */
+/*   Updated: 2022/06/17 13:42:09 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,17 +20,6 @@ int help()
                     "  -h\t\t     print help and exit\n"
                     "  -v\t\t     verbose output\n");
     return 0;
-}
-
-void error_output(char *message)
-{
-    fprintf(stderr, "%s\n", message);
-}
-
-void error_output_and_exit(char *message)
-{
-    fprintf(stderr, "%s\n", message);
-    exit(1);
 }
 
 void ft_getadress(char *host_name)
@@ -193,10 +182,7 @@ void ping_loop(void)
 int parsing(int ac, char **av)
 {
     if (ac < 2)
-    {
-        fprintf(stderr, "ping: usage error: Destination address required\n");
-        exit(1);
-    }
+        ft_printerr_exit("ft_ping: usage error: Destination address required", 1);
     for (int i = 1; i < ac; i++)
     {
         if (av[i][0] == '-')
@@ -233,38 +219,37 @@ int parsing(int ac, char **av)
         else
         {
             params.user_requested_address = av[i];
+            ft_getadress(params.user_requested_address);
             _checkOpt(); // for params
+            add_options_modification();
             return (true);
         }
+    }
+    if (!params.user_requested_address)
+    {
+        fprintf(stderr, "ft_ping: usage error: Destination address required\n");
+        exit(2);
     }
     return (true);
 }
 
 int main(int ac, char **av)
 {
+    init();
     if (parsing(ac, av))
     {
-        if (!params.user_requested_address)
+        set_signal();
+        if (params.address)
+            create_socket();
+        if (params.socket_fd != -1)
         {
-            fprintf(stderr, "Dping: usage error: Destination address required\n");
-            exit(2);
-        }
-        else
-        {
-            init(ac, av);
-            set_signal();
-            if (params.address)
-                create_socket();
-            if (params.socket_fd != -1)
-            {
-                printf("PING %s (%s) %d(%d) bytes of data.\n",
-                       params.reversed_address,
-                       params.address,
-                       params.packet_size,
-                       params.packet_size + 28);
-                params.start = get_time();
-                ping_loop();
-            }
+            printf("PING %s (%s) %d(%d) bytes of data.\n",
+                   params.reversed_address,
+                   params.address,
+                   params.packet_size,
+                   params.packet_size + 28);
+            params.start = get_time();
+            ping_loop();
         }
     }
     return (0);

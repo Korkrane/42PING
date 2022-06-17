@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   packet.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: xubuntu <xubuntu@student.42.fr>            +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/29 22:23:15 by bahaas            #+#    #+#             */
-/*   Updated: 2022/06/13 12:53:07 by xubuntu          ###   ########.fr       */
+/*   Updated: 2022/06/17 12:22:23 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,9 +27,9 @@ int send_packet(t_packet *packet)
     if (sent_bytes <= 0)
     {
         if (errno == ENETUNREACH)
-            error_output(NO_CONNEXION_ERROR);
+            ft_printerr(NO_CONNEXION_ERROR);
         else
-            error_output(SENDTO_ERROR);
+            ft_printerr(SENDTO_ERROR);
         return (false);
     }
     if (params.flags & f)
