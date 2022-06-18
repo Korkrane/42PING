@@ -6,14 +6,19 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/29 19:05:15 by bahaas            #+#    #+#             */
-/*   Updated: 2021/07/30 15:10:03 by bahaas           ###   ########.fr       */
+/*   Updated: 2022/06/18 02:29:17 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "includes/ft_ping.h"
 
 
-void set_rtt_stats(double rtt)
+/**
+ * @brief update the statistics value printed at the end
+ *
+ * @param rtt round-trip-time
+ */
+void setRTTstats(double rtt)
 {
 	if(params.time.min == 0 || rtt < params.time.min)
 		params.time.min = rtt;
@@ -21,9 +26,10 @@ void set_rtt_stats(double rtt)
 		params.time.max = rtt;
 	params.time.total += rtt;
 	params.time.avg = params.time.total / params.received_packets;
+	params.time.total2 += rtt * rtt;
 }
 
-double get_mdev()
+double getMdev()
 {
 	double mdev;
 	double avg;
@@ -32,19 +38,26 @@ double get_mdev()
 	avg = params.time.total / params.received_packets;
 	avg_square = (params.time.total * params.time.total) / params.received_packets;
 	mdev = sqrt(avg_square - (avg * avg));
+
+    //tsum += triptime;
+	//tsum2 += (long long)triptime * (long long)triptime
+           // tsum /= nreceived + nrepeats;
+            //tsum2 /= nreceived + nrepeats;
+        //double newmdev = sqrt(params.time.total2 - 	params.time.total * 	params.time.total);
+
+
+		// double n = nreceived + nrepeats;
+		// double avg = tsum / n;
+		// double vari = tsumsq / n - avg * avg;
+		// (void)printf(
+		//     "round-trip min/avg/max/stddev = %.3f/%.3f/%.3f/%.3f ms\n",
+		//     tmin, avg, tmax, sqrt(vari));
+
+		double n =  params.received_packets;
+		double avg2 = params.time.total / n;
+		double vari = params.time.total2 / n - avg2 * avg2;
+		double newmdev = sqrt(vari);
+	printf("old mdev: %f\n", mdev);
+	printf("new mdev: %f\n", newmdev);
 	return (mdev);
-}
-
-int print_stats()
-{
-	long time;
-	double mdev;
-
-	time = get_elapsed_time(params.start);
-	if(params.received_packets == 1)
-		time = 0;
-	printf("\n--- %s ping statistics ---\n", params.reversed_address);
-	printf("%d packets transmitted, %d received, %d%% packet loss, time %ldms\n", params.sent_packets, params.received_packets, 0, time);
-	printf("rtt min/avg/max/mdev = %.3lf/%.3lf/%.3lf/%.3lf ms\n", params.time.min, params.time.avg, params.time.max, get_mdev());
-	return (true);
 }

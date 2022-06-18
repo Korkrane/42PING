@@ -3,28 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   packet.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/29 22:23:15 by bahaas            #+#    #+#             */
-/*   Updated: 2022/06/17 12:22:23 by marvin           ###   ########.fr       */
+/*   Updated: 2022/06/18 02:26:24 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "includes/ft_ping.h"
 
-void print_packet(t_packet *packet)
+int sendPacket(t_packet *packet)
 {
-    printf("data_buffer %s\n", packet->data_buffer);
-}
-
-int send_packet(t_packet *packet)
-{
-    ssize_t sent_bytes;
-
-    // print_packet(packet);
-    sent_bytes = sendto(params.socket_fd, packet, sizeof(*packet), 0,
-                        (struct sockaddr *)&params.sockaddr, sizeof(params.sockaddr));
-    if (sent_bytes <= 0)
+    params.sent_packets++;
+    if (sendto(params.socket_fd, packet, sizeof(*packet), 0,(struct sockaddr *)&params.sockaddr, sizeof(params.sockaddr)) <= 0)
     {
         if (errno == ENETUNREACH)
             ft_printerr(NO_CONNEXION_ERROR);
@@ -32,12 +23,10 @@ int send_packet(t_packet *packet)
             ft_printerr(SENDTO_ERROR);
         return (false);
     }
-    if (params.flags & f)
-        printf(".");
     return (true);
 }
 
-unsigned short checksum(void *address, int len)
+static unsigned short checksum(void *address, int len)
 {
     unsigned short *buff;
     unsigned long sum;
@@ -57,17 +46,16 @@ unsigned short checksum(void *address, int len)
     return ((unsigned short)~sum);
 }
 
-void init_packet(struct s_packet *packet, struct timeval current_time)
+void initPacket(struct s_packet *packet)
 {
     ft_bzero(packet, sizeof(t_packet));
-    packet->icmp_header.icmp_type = ICMP_ECHO;
-    packet->icmp_header.icmp_code = 0;
-    packet->icmp_header.icmp_seq = BSWAP16(params.seq);
-    packet->icmp_header.icmp_id = BSWAP16(params.process_id);
-    ft_memcpy(&packet->icmp_header.icmp_dun, &(current_time.tv_sec), sizeof(current_time.tv_sec));
-    packet->icmp_header.icmp_cksum = 0;
-    packet->icmp_header.icmp_cksum = checksum(packet, sizeof(*packet));
-    // handle packet error here :)
-    // printf("sizeof(*packet): %ld\n", sizeof(*packet));
-    params.sent_packets++;
+    packet->hdr.type = ICMP_ECHO;
+    packet->hdr.un.echo.id = BSWAP16(params.process_id);
+    packet->hdr.un.echo.sequence = BSWAP16(params.seq);
+
+    for (int i = 0; i < (int)(sizeof(packet->msg) - 1); i++)
+        packet->msg[i] = i + '0';
+    packet->msg[i] = 0;
+
+    packet->hdr.checksum = checksum(packet, sizeof(*packet));
 }

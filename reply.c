@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   reply.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/29 22:25:00 by bahaas            #+#    #+#             */
-/*   Updated: 2022/06/17 12:22:39 by marvin           ###   ########.fr       */
+/*   Updated: 2022/06/18 02:35:22 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "includes/ft_ping.h"
 
-int check_reply(t_reply *reply)
+static int checkReply(t_reply *reply)
 {
 	struct ip *packet_content;
 
@@ -28,21 +28,22 @@ int check_reply(t_reply *reply)
 		return (TTL_EXCEEDED_CODE);
 	else if (BSWAP16(reply->icmp->icmp_id) != params.process_id || BSWAP16(reply->icmp->icmp_seq) != params.seq)
 	{
-		init_reply(reply);
-		return (receive_reply(reply));
+		initReply(reply);
+		return (recvReply(reply));
 	}
 	return (true);
 }
 
-int receive_reply(t_reply *reply)
+int recvReply(t_reply *reply)
 {
 	reply->received_bytes = recvmsg(params.socket_fd, &(reply->msghdr), 0);
 	if (reply->received_bytes > 0)
-		return (check_reply(reply));
+		return (checkReply(reply));
 	else
 	{
 		if ((errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR))
 		{
+			printf("errror\n");
 			;
 		}
 		else
@@ -52,7 +53,7 @@ int receive_reply(t_reply *reply)
 	return (true);
 }
 
-void init_reply(t_reply *reply)
+void initReply(t_reply *reply)
 {
 	ft_bzero(reply, sizeof(t_reply));
 	reply->iov.iov_base = reply->receive_buffer;

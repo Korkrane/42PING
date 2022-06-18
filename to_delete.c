@@ -6,13 +6,13 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/29 22:27:42 by bahaas            #+#    #+#             */
-/*   Updated: 2021/07/29 22:27:59 by bahaas           ###   ########.fr       */
+/*   Updated: 2022/06/18 02:14:03 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "includes/ft_ping.h"
 
-void _checkOpt()
+void checkOptDebug()
 {
 	printf("OPT CHECK :\n");
 	if(params.flags & D)

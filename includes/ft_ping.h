@@ -6,7 +6,7 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/23 18:06:43 by bahaas            #+#    #+#             */
-/*   Updated: 2022/06/17 17:28:18 by bahaas           ###   ########.fr       */
+/*   Updated: 2022/06/18 02:34:53 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,24 +25,14 @@
 #include <arpa/inet.h>
 #include <errno.h>
 #include <math.h>
-
-#include <netinet/ip_icmp.h> //include icmphdr struct and ICMP_* var
-#include <netinet/in.h>		 //include icmphdr struct and ICMP_* var
+#include <stdbool.h>
+#include <netinet/ip_icmp.h>
 #include "../libft/libft.h"
 
-#define BSWAP16(x) ((__uint16_t)((((x) >> 8) & 0xff) | (((x)&0xff) << 8)))
-
-/*
-** ERROR MESSAGE DEFINES
-*/
-
-#define USAGE "Usage: ft_ping [-v verbose] [-h help] [-t ttl] [-c count] [-i interval] [-f flood] destination"
-#define BAD_FLAG_ERROR "ft_ping: invalid option -- '%c'\n"
 #define BAD_TTL_ERROR "ft_ping: can't set time to live: invalid argument"
 #define BAD_COUNT_ERROR "ft_ping: bad number of packets to transmit"
 #define BAD_INTERVAL_ERROR "ft_ping: bad timing interval"
 #define PERMISSION_ERROR "ft_ping: socket: operation not permitted"
-#define UNKNOWN_ADDR_ERROR "ft_ping: %s: failure in name resolution\n"
 #define SOCKET_ERROR "ft_ping: socket: operation not permitted"
 #define SETSOCKOPT_ERROR "ft_ping: setsockopt: error while setting socket options"
 #define TIMEOFDAY_ERROR "ft_ping: gettimeofday: error while trying to access current time"
@@ -52,7 +42,6 @@
 #define REPLY_ERROR "ft_ping: reply is not what was expected (not ICMP)"
 #define TIMEOUT_ERROR "ft_ping: recvmsg: request timed out"
 
-#define ADDRINFO_ERROR(name) ("##name")
 #define ERROR_I_OPT "ping: bad timing interval."
 #define ERROR_C_OPT "ping: bad number of packets to transmit."
 #define ERROR_L_OPT "ping: bad preload value, should be 1.65536"
@@ -62,13 +51,9 @@
 // idée : # define ERROR_MAX_S_OPT ("Error: packet size %d is too large. Maximum is 65507", packet_size)
 // si -s lettre set size packet a 0
 
-/*
-** FUNCTION RETURN DEFINES
-*/
-
+#define BSWAP16(x) ((__uint16_t)((((x) >> 8) & 0xff) | (((x)&0xff) << 8)))
 #define TTL_EXCEEDED_CODE 2
-#define ERROR_CODE 1
-#define SUCCESS_CODE 0
+#define PACKET_SIZE 64
 
 typedef enum e_flags
 {
@@ -97,10 +82,12 @@ typedef struct s_reply
 	char control[CMSG_SPACE(sizeof(int))];
 } t_reply;
 
+
+
 typedef struct s_packet
 {
-	struct icmp icmp_header;
-	char data_buffer[36]; // change for -s
+	struct icmphdr hdr;
+	char msg[PACKET_SIZE - sizeof(struct icmphdr)];
 } t_packet;
 
 typedef struct s_time
@@ -109,6 +96,7 @@ typedef struct s_time
 	double min;
 	double max;
 	double total;
+	double total2;
 } t_time;
 
 typedef struct s_opt
@@ -119,12 +107,11 @@ typedef struct s_opt
 	int ttl;
 	double deadline;
 	int packet_size;
-	char *bell;
 } t_opts;
 
 typedef struct s_params
 {
-	char *user_requested_address;
+	char *requestedAddress;
 	char *address;
 	char *reversed_address;
 	int quit;
@@ -147,41 +134,53 @@ typedef struct s_params
 } t_params;
 
 t_params params;
-int receive_reply(t_reply *reply);
 
-void init_packet(struct s_packet *packet, struct timeval current_time);
-void init_reply(t_reply *reply);
-void init();
+/** to delete later **/
+void 	checkOptDebug();
 
-void initSignal();
-void sig_int();
-void sig_quit();
+/** options.c **/
+void	addParamWithoutValue(char opt);
+void	addParamWithValue(char **av, int *k, int j, int *flag);
 
-void ft_getadress(char *host_name);
-unsigned short checksum(void *address, int len);
+/** init.c **/
+void	init();
+void	addOptionsModifications();
 
-void add_no_params_opt(char opt);
-void add_params_opt(char **av, int *k, int j, int *flag);
-long long get_count(char **av, int *i, int j, long long min_limit, long long max_limit);
-void get_interval(char **av, int *i, int j);
-void get_preload(char **av, int *i, int j);
-void get_ttl(char **av, int *i, int j);
-void get_deadline(char **av, int *i, int j);
-void get_packetsize(char **av, int *i, int j);
+/** socket.c **/
+void	createSocket();
 
-double get_time(void);
-double get_elapsed_time(double starter);
-double calculate_elapsed_time(struct timeval start, struct timeval end);
-void set_time(struct timeval *destination);
+/** reply.c **/
+void	initReply(t_reply *reply);
+int		recvReply(t_reply *reply);
 
-void addOptionsModifications();
-int print_stats();
-void set_rtt_stats(double rtt);
-double get_mdev();
+/** signal.c **/
+void	initSignal();
 
-void createSocket();
+/** time.c **/
+double	getTime();
+double	getElapsedTime(double starter);
+double	getTimeDiff(struct timeval start, struct timeval end);
+void	setTime(struct timeval *destination);
+void	waitForInterval(struct timeval start);
 
-int send_packet(t_packet *packet);
+/** packet.c **/
+void	initPacket(struct s_packet *packet);
+int		sendPacket(t_packet *packet);
 
-void _checkOpt(); // TO DELETE
+/** stats.c **/
+void	setRTTstats(double rtt);
+double	getMdev();
+
+/** utils.c **/
+
+int		hasOptionEnabled(int opt);
+int		hasReachedCountLimit();
+
+/** print.c **/
+
+void	printTimestamp();
+void	printPingInfo();
+void	printReplyInfos(t_reply reply, double time);
+void	printStats();
+
 #endif
