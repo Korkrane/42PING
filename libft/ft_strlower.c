@@ -6,7 +6,7 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/24 10:51:06 by bahaas            #+#    #+#             */
-/*   Updated: 2022/05/24 11:04:59 by bahaas           ###   ########.fr       */
+/*   Updated: 2022/06/18 02:40:45 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,5 @@ char		*ft_strlower(char *str)
 
     for(unsigned long i = 0; i < strlen(lower);i++)
         lower[i] = ft_tolower(lower[i]);
-    //printf("%s\n", str);
     return lower;
 }
