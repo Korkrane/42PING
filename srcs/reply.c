@@ -6,11 +6,11 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/29 22:25:00 by bahaas            #+#    #+#             */
-/*   Updated: 2022/06/18 02:35:22 by bahaas           ###   ########.fr       */
+/*   Updated: 2022/06/18 04:12:29 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "includes/ft_ping.h"
+#include "../includes/ft_ping.h"
 
 static int checkReply(t_reply *reply)
 {

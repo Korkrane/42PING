@@ -6,11 +6,11 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/29 19:00:52 by bahaas            #+#    #+#             */
-/*   Updated: 2022/06/18 02:15:39 by bahaas           ###   ########.fr       */
+/*   Updated: 2022/06/18 04:12:52 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "includes/ft_ping.h"
+#include "../includes/ft_ping.h"
 
 /**
  * @brief Get the Time

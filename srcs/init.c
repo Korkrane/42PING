@@ -6,11 +6,11 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/28 20:03:27 by bahaas            #+#    #+#             */
-/*   Updated: 2022/06/18 02:07:25 by bahaas           ###   ########.fr       */
+/*   Updated: 2022/06/18 04:11:59 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "includes/ft_ping.h"
+#include "../includes/ft_ping.h"
 
 static void initTime()
 {

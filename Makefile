@@ -6,18 +6,17 @@
 #    By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/03/04 15:07:09 by bahaas            #+#    #+#              #
-#    Updated: 2022/06/18 03:14:20 by bahaas           ###   ########.fr        #
+#    Updated: 2022/06/18 04:11:48 by bahaas           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME			= ft_ping
 
-SRCS			= main.c init.c signal.c options.c time.c stats.c socket.c packet.c utils.c to_delete.c reply.c print.c
+SRCS			= $(wildcard srcs/*.c)\
 
 CC				= clang
 
 CFLAGS			= -Wextra -Werror -Wall -g
-#CFLAGS			= -g
 
 HEADER			= -I /includes
 

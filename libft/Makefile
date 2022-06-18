@@ -6,7 +6,7 @@
 #    By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/09/15 14:40:58 by bahaas            #+#    #+#              #
-#    Updated: 2022/06/18 02:41:32 by bahaas           ###   ########.fr        #
+#    Updated: 2022/06/18 04:04:07 by bahaas           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,47 +18,39 @@ CC		= clang
 
 CFLAGS		= -Wall -Wextra -Werror
 
-HEADER		= -I .
+HEADER		= -I. -c
 
-SRCS		= ft_memset.c ft_bzero.c ft_memcpy.c ft_memccpy.c ft_memmove.c ft_memchr.c \
-			ft_memcmp.c ft_strlen.c ft_isalpha.c ft_isdigit.c ft_isalnum.c ft_isascii.c \
-			ft_isprint.c ft_toupper.c ft_tolower.c ft_strchr.c ft_strrchr.c ft_strncmp.c \
-			ft_strlcpy.c ft_strlcat.c ft_strnstr.c ft_atoi.c ft_calloc.c ft_strdup.c \
-			ft_substr.c ft_strjoin.c ft_strtrim.c ft_split.c ft_itoa.c ft_strmapi.c \
-			ft_putchar_fd.c ft_putstr_fd.c ft_putendl_fd.c ft_putnbr_fd.c ft_lstnew.c \
-			ft_lstadd_front.c ft_lstsize.c ft_lstlast.c ft_lstadd_back.c ft_isspace.c\
-			ft_lstdelone.c ft_lstclear.c ft_lstiter.c ft_lstmap.c ft_strndup.c ft_strnew.c\
-			ft_memalloc.c ft_strncpy.c ft_strcpy.c  ft_strcat.c ft_strstr.c   ft_strcmp.c \
-			ft_strncat.c ft_putchar.c ft_putstr.c ft_putnchar.c ft_isspace.c ft_memdel.c \
-			ft_memdup.c ft_putnbr.c ft_putendl.c ft_strequ.c ft_strnequ.c ft_strdel.c \
-			ft_strclr.c ft_striter.c ft_striteri.c ft_strmap.c ft_lstsplit.c \
-			get_next_line.c get_next_line_utils.c ft_intlen.c ft_nsplit.c ft_add_char.c \
-			ft_add_str.c ft_is_nbr.c ft_is_empty.c \
-			ft_strlower.c ft_strupper.c ft_strjoins.c ft_printerr.c ft_printerr_exit.c
+SRCS = $(wildcard *.c)\
+		$(wildcard boolean/*.c)\
+		$(wildcard error/*.c)\
+		$(wildcard gnl/*.c)\
+		$(wildcard ints/*.c)\
+		$(wildcard lists/*.c)\
+		$(wildcard memory/*.c)\
+		$(wildcard misc/*.c)\
+		$(wildcard put/*.c)\
+		$(wildcard strings/*.c)\
 
 OBJS		= ${SRCS:.c=.o}
 
 .c.o:
-			@printf "\033[0;33mGenerating libft objects... %-33.33s\r" $@
+			@printf "\033[34m[LIBFT]\033[0m Generating libft objects files: \033[0;33m%-33.33s\r\033[0m" $@
 			@${CC} ${CFLAGS} ${HEADER} -c $< -o ${<:.c=.o}
 
 all:		${NAME}
 
 $(NAME):	${OBJS}
-			@echo "\n----------- \033[32mTerminé\033[0m -----------"
 
 			@ar rc ${NAME} ${OBJS}
-			@echo "\033[0m\nCréation de la librairie ...libft \033[32mok\033[0m"
+			@echo "\n\033[34m[LIBFT]\033[0m \033[32mLIBRARY READY\033[0m"
 			@ranlib ${NAME}
-			@echo "Optimisation ... \033[32mok\033[0m"
-			@echo "\033[1;31;40m -------------- TERMINÉ ---------------\033[0m"
 
 clean:
 			@rm -f ${OBJS}
-			@echo "\033[0m\nSuppression fichiers *.o  ... \033[32mok\033[0m"
+			@echo "\033[34m[LIBFT]\033[0m \033[32mDelete object files :OK\033[0m"
 
 fclean:		clean
 			@rm -f ${NAME}
-			@echo "\033[0mSuppression "${NAME}" ... \033[32mok\033[0m"
+			@echo "\033[34m[LIBFT]\033[0m \033[32mDelete executable files : \033[32mOK\033[0m"
 
 re:			fclean	all

@@ -1,30 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   signal.c                                           :+:      :+:    :+:   */
+/*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/07/28 20:09:38 by bahaas            #+#    #+#             */
-/*   Updated: 2022/06/17 18:36:50 by bahaas           ###   ########.fr       */
+/*   Created: 2021/07/29 22:27:26 by bahaas            #+#    #+#             */
+/*   Updated: 2022/06/18 04:13:00 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "includes/ft_ping.h"
+#include "../includes/ft_ping.h"
 
-void sigInt()
+int hasOptionEnabled(int opt)
 {
-	params.quit = 1;
-	printStats();
+    if(params.flags & opt)
+        return true;
+    return false;
 }
 
-void sigQuit()
+int hasReachedCountLimit()
 {
-	params.quit = 1;
-}
-
-void initSignal()
-{
-	signal(SIGINT, &sigInt);
-	signal(SIGQUIT, &sigQuit);
+        params.opts.count--;
+        if (params.opts.count == 0)
+        {
+            printStats();
+            return true;
+        }
+    return false;
 }

@@ -6,11 +6,11 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/29 22:20:43 by bahaas            #+#    #+#             */
-/*   Updated: 2022/06/17 13:58:08 by bahaas           ###   ########.fr       */
+/*   Updated: 2022/06/18 04:12:44 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "includes/ft_ping.h"
+#include "../includes/ft_ping.h"
 
 void createSocket()
 {
