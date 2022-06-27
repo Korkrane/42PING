@@ -6,11 +6,13 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/28 16:53:09 by bahaas            #+#    #+#             */
-/*   Updated: 2022/06/24 16:50:50 by bahaas           ###   ########.fr       */
+/*   Updated: 2022/06/27 19:32:21 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ft_ping.h"
+
+t_params params;
 
 int help()
 {
@@ -34,7 +36,7 @@ void setAddress(char *host_name)
     hints.ai_flags = AI_CANONNAME;
     if (getaddrinfo(host_name, NULL, &hints, &res) != 0)
     {
-        fprintf(stderr, "ping: %s: Name or service not known\n", host_name);
+        fprintf(stderr, "ft_ping: %s: Name or service not known\n", host_name);
         exit(2);
     }
     params.reversed_address = res->ai_canonname;
