@@ -6,7 +6,7 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/29 22:25:00 by bahaas            #+#    #+#             */
-/*   Updated: 2022/06/18 04:12:29 by bahaas           ###   ########.fr       */
+/*   Updated: 2022/06/24 16:58:21 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ static int checkReply(t_reply *reply)
 	if (packet_content->ip_p != IPPROTO_ICMP)
 	{
 		//	if (params.flags & V_FLAG)
-		//		ft_printerr(REPLY_ERROR);
+		//		printError(REPLY_ERROR);
 		return (false);
 	}
 	reply->icmp = (struct icmp *)(reply->receive_buffer + (packet_content->ip_hl << 2));
@@ -47,7 +47,7 @@ int recvReply(t_reply *reply)
 			;
 		}
 		else
-			ft_printerr(RECV_ERROR);
+			printError(RECV_ERROR);
 		return (false);
 	}
 	return (true);

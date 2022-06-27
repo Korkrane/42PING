@@ -6,7 +6,7 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/28 16:53:09 by bahaas            #+#    #+#             */
-/*   Updated: 2022/06/18 04:12:08 by bahaas           ###   ########.fr       */
+/*   Updated: 2022/06/24 16:50:50 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,7 +125,7 @@ void ping(void)
 int parsing(int ac, char **av)
 {
     if (ac < 2)
-        ft_printerr_exit("ft_ping: usage error: Destination address required", 1);
+        printErrorAndExit("ft_ping: usage error: Destination address required", 1);
     for (int i = 1; i < ac; i++)
     {
         if (av[i][0] == '-')
@@ -163,7 +163,7 @@ int parsing(int ac, char **av)
         }
     }
     if (!params.requestedAddress)
-        ft_printerr_exit("ft_ping: usage error: Destination address required", 2);
+        printErrorAndExit("ft_ping: usage error: Destination address required", 2);
     return (true);
 }
 
@@ -174,7 +174,8 @@ int main(int ac, char **av)
     {
         print_params();
         initSignal();
-        createSocket();
+        if(params.address)
+            params.socket_fd = createSocket();
         printPingInfo();
         ping();
     }

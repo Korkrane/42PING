@@ -6,7 +6,7 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/29 19:00:52 by bahaas            #+#    #+#             */
-/*   Updated: 2022/06/18 04:12:52 by bahaas           ###   ########.fr       */
+/*   Updated: 2022/06/24 17:29:06 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ double getTime()
  * @param starter
  * @return double
  */
-double getElapsedTime(double starter)
+double getElapsedTime(double starter) //TODO delete and swap with getTimeDelta
 {
 	struct timeval tv;
 	double end;
@@ -58,7 +58,7 @@ double getTimeDiff(struct timeval start, struct timeval end)
 void setTime(struct timeval *time)
 {
 	if (gettimeofday(time, NULL) == -1)
-		ft_printerr_exit(TIMEOFDAY_ERROR, 1);
+		printErrorAndExit(TIMEOFDAY_ERROR, 1);
 }
 
 void waitForInterval(struct timeval start)

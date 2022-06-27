@@ -6,7 +6,7 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/23 18:06:43 by bahaas            #+#    #+#             */
-/*   Updated: 2022/06/18 02:34:53 by bahaas           ###   ########.fr       */
+/*   Updated: 2022/06/24 16:55:28 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,7 +147,7 @@ void	init();
 void	addOptionsModifications();
 
 /** socket.c **/
-void	createSocket();
+int		createSocket();
 
 /** reply.c **/
 void	initReply(t_reply *reply);

@@ -6,7 +6,7 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/29 22:23:15 by bahaas            #+#    #+#             */
-/*   Updated: 2022/06/18 04:12:21 by bahaas           ###   ########.fr       */
+/*   Updated: 2022/06/24 16:57:55 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,9 @@ int sendPacket(t_packet *packet)
     if (sendto(params.socket_fd, packet, sizeof(*packet), 0,(struct sockaddr *)&params.sockaddr, sizeof(params.sockaddr)) <= 0)
     {
         if (errno == ENETUNREACH)
-            ft_printerr(NO_CONNEXION_ERROR);
+            printError(NO_CONNEXION_ERROR);
         else
-            ft_printerr(SENDTO_ERROR);
+            printError(SENDTO_ERROR);
         return (false);
     }
     return (true);

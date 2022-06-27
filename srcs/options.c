@@ -6,7 +6,7 @@
 /*   By: bahaas <bahaas@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/29 18:57:14 by bahaas            #+#    #+#             */
-/*   Updated: 2022/06/18 18:22:57 by bahaas           ###   ########.fr       */
+/*   Updated: 2022/06/24 16:51:41 by bahaas           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ static void checkLimits(long long value, long long min_limit, long long max_limi
 static void checkStringIsNumber(char *str)
 {
 	if (!ft_isnbr(str))
-		ft_printerr_exit(ft_strjoin("ft_ping: invalid argument: ", str), 1);
+		printErrorAndExit(ft_strjoin("ft_ping: invalid argument: ", str), 1);
 }
 
 static long long getValue(long long min_limit, long long max_limit, char *str)
